@@ -21,6 +21,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.SensorManagement;
+import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
@@ -104,7 +107,33 @@ public class AddSensorActivity extends AppCompatActivity {
         double currentLongitude = lastKnownLocation.getLongitude();
         double currentLatitude = lastKnownLocation.getLatitude();
         GpsCoordinate gpsCoordinate = new GpsCoordinate(currentLatitude, currentLongitude);
-        //sensorManagement.mapSensor(gpsCoordinate);
+
+        SensorManagement manager = new SensorManagement();
+
+        int cnt = FakeDatabaseRepository.UnmappedSensors.size();
+
+        // TODO dont do this check heheheheh
+        if(cnt == 0){
+            finish();
+        }
+        String uuid = FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid();
+        SensorManagement.MapSensorResult result = manager.MapExistingSensor(uuid, gpsCoordinate);
+
+        switch (result){
+            case SENSOR_SUCCESSFULLY_MAPPED:{
+                Toast.makeText(this, editTextSensorName.getText() + " was successfully added!", Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case WAS_ALREADY_MAPPED:{
+                Toast.makeText(this, editTextSensorName.getText() + " was already added!", Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case NO_SENSOR_WITH_THAT_UUID_ON_DATABASE:{
+                Toast.makeText(this, editTextSensorName.getText() + " with uuid: "+uuid+" was not found on the database!", Toast.LENGTH_SHORT).show();
+                break;
+            }
+        }
+
         finish();
     }
 
