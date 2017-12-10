@@ -129,20 +129,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         }
 
         final Activity thisActivity = this;
+        ActivityCompat.requestPermissions(thisActivity, permissions,
+                RC_HANDLE_CAMERA_PERM);
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(thisActivity, permissions,
-                        RC_HANDLE_CAMERA_PERM);
-            }
-        };
-
-        findViewById(R.id.topLayout).setOnClickListener(listener);
-        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
-                .show();
     }
 
     @Override
@@ -281,6 +270,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             boolean autoFocus = getIntent().getBooleanExtra(AutoFocus,true);
             boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
             createCameraSource(autoFocus, useFlash);
+            Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom",
+                    Snackbar.LENGTH_LONG)
+                    .show();
             return;
         }
 

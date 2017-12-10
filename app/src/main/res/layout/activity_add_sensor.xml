@@ -25,17 +25,18 @@
         android:id="@+id/include"
         layout="@layout/content_add_sensor" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="87dp"
-        android:layout_height="86dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/colorPrimary"
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="129dp"
+        android:layout_height="110dp"
+        android:adjustViewBounds="false"
+        android:background="@color/colorPrimaryDark"
+        android:contentDescription="@string/content_description_add_sensor_with_this_button"
+        android:cropToPadding="false"
+        android:scaleType="fitCenter"
         app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="right|center"
+        app:layout_anchorGravity="center"
         app:srcCompat="@android:drawable/ic_menu_camera"
-        tools:layout_editor_absoluteX="281dp"
-        tools:layout_editor_absoluteY="465dp" />
+        tools:layout_editor_absoluteX="133dp" />
 
 </android.support.design.widget.CoordinatorLayout>
