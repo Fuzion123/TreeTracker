@@ -38,8 +38,9 @@ public class AddSensorActivity extends AppCompatActivity {
     private Button buttonAddSensor;
     private EditText editTextSensorName;
     private TextView textViewInformationToUser, textViewUUIDKey, textViewUUIDValue, textViewLocationPermission;
-
     private ImageButton imageButton;
+
+    private String uuid = "";
 
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
@@ -217,6 +218,7 @@ public class AddSensorActivity extends AppCompatActivity {
                     textViewLocationPermission.setVisibility(View.VISIBLE);
                     textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
                     textViewUUIDValue.setText(barcode.displayValue);
+                    uuid = barcode.displayValue;
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
                 } else {
                     Log.d(TAG, "No barcode captured, intent data is null");
