@@ -19,9 +19,21 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
+import android.widget.Toast;
+
+import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
+import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
+import com.apps.frederik.treetracker.Model.Provider.FakeHumidityDataProvider;
+import com.apps.frederik.treetracker.Model.Provider.FakeHumiditySensorProvider;
+import com.apps.frederik.treetracker.Model.Sensor.HumiditySensor;
+import com.apps.frederik.treetracker.Model.Sensor.ISensor;
+import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorData;
+
+import java.text.ParseException;
+import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
 
     private static final int RC_BARCODE_CAPTURE = 1234;
     private static final String TAG = "OverviewActivity";
@@ -50,6 +62,47 @@ public class OverviewActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // inflating fragment
+        // inspired by: https://developer.android.com/training/basics/fragments/fragment-ui.html
+        if(findViewById(R.id.fragment_container) != null){
+            if(savedInstanceState != null){
+                return;
+            }
+
+            SensorListFragment listFragment = new SensorListFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, listFragment).commit();
+        }
+
+
+        try {
+            int sensorCount = 10;
+            FakeHumiditySensorProvider provider = new FakeHumiditySensorProvider(sensorCount);
+            List<ISensor> sensors = provider.GetAllSensors();
+
+            for (ISensor sensor : sensors) {
+
+                Log.d("Test", "Sensor Name: "+ sensor.GetName());
+                Log.d("Test", "Sensor UUID: " + sensor.GetUuid());
+                Log.d("Test", "Sensor GPS Coordinates: (Lat: " + sensor.GetCoordinate().GetLatitude() + ", Long: " + sensor.GetCoordinate().GetLongitude()+")");
+
+                FakeHumidityDataProvider dataProvider = new FakeHumidityDataProvider(10);
+                List<ISensorData> data = dataProvider.GetAllReadings("hehe");
+
+                for (ISensorData d : data) {
+                    sensor.GetHistoricalData().add(d);
+                    Log.d("Test", "SensorReading Data: " + d.GetData());
+                    Log.d("Test", "SensorReading Timetstamp: " + d.GetTimeStamp().get_year());
+                }
+                Log.d("Test", "Sensor Readings: " + sensor.GetHistoricalData().size());
+             }
+            }catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+
     }
 
     @Override
@@ -125,5 +178,10 @@ public class OverviewActivity extends AppCompatActivity
         else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+        Toast.makeText(this, "Item Details: " + item.details, Toast.LENGTH_SHORT).show();
     }
 }
