@@ -1,9 +1,10 @@
 package com.apps.frederik.treetracker.Model.Provider;
 
+import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorEventListener;
+import com.apps.frederik.treetracker.Model.InternalCommunication.SensorEventArgs;
 import com.apps.frederik.treetracker.Model.Sensor.HumiditySensor;
 import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.HumidityData;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorData;
+import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 import com.apps.frederik.treetracker.Model.Util.AarhusLatitudeLongitudeConstrains;
 import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
 import java.util.ArrayList;
@@ -18,15 +19,23 @@ import static java.util.UUID.randomUUID;
 public class FakeHumiditySensorProvider implements ISensorProvider {
     private Random _random = new Random();
     private List<ISensor> sensors = new ArrayList<>();
+    private ISensorEventListener _listener;
 
-    public FakeHumiditySensorProvider(int numberOfFakeSensors){
+    public FakeHumiditySensorProvider(int numberOfFakeSensors, ISensorEventListener listener){
+        _listener = listener;
+
         for (int i = 0; i < numberOfFakeSensors; i++) {
-            sensors.add(SensorCreator(i));
+            ISensor sensor = GenerateFakeSensor(i);
+            sensors.add(sensor);
+
+            if(_listener != null){
+                _listener.onNewSensorAddedEvent(this, new SensorEventArgs(sensor));
+            }
         }
     }
 
-    private ISensor SensorCreator(int sensorNr){
-        List<ISensorData> sensors = new ArrayList<>();
+    private ISensor GenerateFakeSensor(int sensorNr){
+        List<ISensorReading> sensors = new ArrayList<>();
         String name = "HumiditySensor ".concat(String.valueOf(sensorNr));
         String uuid = randomUUID().toString();
         GpsCoordinate coordinate = GpsFakeGenerator();
@@ -37,6 +46,11 @@ public class FakeHumiditySensorProvider implements ISensorProvider {
     @Override
     public List<ISensor> GetAllSensors() {
         return sensors;
+    }
+
+    @Override
+    public void setSensorEventListener(ISensorEventListener listener) {
+        _listener = listener;
     }
 
     @Override

@@ -1,10 +1,16 @@
 package com.apps.frederik.treetracker;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,52 +21,37 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
-import com.google.android.gms.vision.barcode.Barcode;
-import android.widget.Toast;
-
 import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
 import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
-import com.apps.frederik.treetracker.Model.Provider.FakeHumidityDataProvider;
-import com.apps.frederik.treetracker.Model.Provider.FakeHumiditySensorProvider;
-import com.apps.frederik.treetracker.Model.Sensor.HumiditySensor;
-import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorData;
+import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
 
-import java.text.ParseException;
-import java.util.List;
-
-public class OverviewActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
-
-    private static final int RC_BARCODE_CAPTURE = 1234;
-    private static final String TAG = "OverviewActivity";
+public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
+    private SensorServiceBinder _binder;
+    private boolean _isBoundToService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OverviewActivity.this, BarcodeCaptureActivity.class);
-                startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // inflating fragment
@@ -75,39 +66,67 @@ public class OverviewActivity extends AppCompatActivity
                     .add(R.id.fragment_container, listFragment).commit();
         }
 
-
-        try {
-            int sensorCount = 10;
-            FakeHumiditySensorProvider provider = new FakeHumiditySensorProvider(sensorCount);
-            List<ISensor> sensors = provider.GetAllSensors();
-
-            for (ISensor sensor : sensors) {
-
-                Log.d("Test", "Sensor Name: "+ sensor.GetName());
-                Log.d("Test", "Sensor UUID: " + sensor.GetUuid());
-                Log.d("Test", "Sensor GPS Coordinates: (Lat: " + sensor.GetCoordinate().GetLatitude() + ", Long: " + sensor.GetCoordinate().GetLongitude()+")");
-
-                FakeHumidityDataProvider dataProvider = new FakeHumidityDataProvider(10);
-                List<ISensorData> data = dataProvider.GetAllReadings("hehe");
-
-                for (ISensorData d : data) {
-                    sensor.GetHistoricalData().add(d);
-                    Log.d("Test", "SensorReading Data: " + d.GetData());
-                    Log.d("Test", "SensorReading Timetstamp: " + d.GetTimeStamp().get_year());
-                }
-                Log.d("Test", "Sensor Readings: " + sensor.GetHistoricalData().size());
-             }
-            }catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-
+        Intent intentService = new Intent(this, SensorService.class);
+        bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
+    protected void onDestroy() {
+        if(_isBoundToService){
+            unbindService(_connection);
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(onSensorAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_SENSOR_ADDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onReadingAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
+
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onSensorAddedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReadingAddedReceiver);
+        super.onPause();
+    }
+
+
+    private BroadcastReceiver onSensorAddedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(OverviewActivity.this, "new sensor Added", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private BroadcastReceiver onReadingAddedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(OverviewActivity.this, "new Reading Added", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection _connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            _binder = (SensorServiceBinder) binder;
+            _isBoundToService = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            _isBoundToService = false;
+        }
+    };
+
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -157,27 +176,9 @@ public class OverviewActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_BARCODE_CAPTURE) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                    Toast.makeText(this, "Now Tracking: "+barcode.displayValue, Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
-                } else {
-                    Log.d(TAG, "No barcode captured, intent data is null");
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override

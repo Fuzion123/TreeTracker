@@ -6,7 +6,7 @@ import com.apps.frederik.treetracker.Model.Util.TimeStamp;
  * Created by Frederik on 12/9/2017.
  */
 
-public interface ISensorData<T>{
+public interface ISensorReading<T>{
     T GetData();
     TimeStamp GetTimeStamp();
 }

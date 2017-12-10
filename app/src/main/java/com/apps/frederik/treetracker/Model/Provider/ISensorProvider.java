@@ -1,5 +1,7 @@
 package com.apps.frederik.treetracker.Model.Provider;
 
+import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorEventListener;
+import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorReadingEventListener;
 import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
  */
 
 public interface ISensorProvider {
-    List<ISensor> GetAllSensors();
     ISensor GetSensor(String uuid);
+    List<ISensor> GetAllSensors();
+    void setSensorEventListener(ISensorEventListener listener);
 }

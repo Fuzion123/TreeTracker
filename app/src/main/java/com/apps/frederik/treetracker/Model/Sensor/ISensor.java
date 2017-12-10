@@ -1,6 +1,6 @@
 package com.apps.frederik.treetracker.Model.Sensor;
 
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorData;
+import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface ISensor {
     String GetName();
     String GetUuid();
     GpsCoordinate GetCoordinate();
-    List<ISensorData> GetHistoricalData();
+    List<ISensorReading> GetHistoricalData();
 }

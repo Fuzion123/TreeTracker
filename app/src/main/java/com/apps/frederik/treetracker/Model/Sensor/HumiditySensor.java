@@ -1,10 +1,8 @@
 package com.apps.frederik.treetracker.Model.Sensor;
 
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.HumidityData;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorData;
+import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,12 +11,12 @@ import java.util.List;
 
 public class HumiditySensor implements ISensor {
 
-    private List<ISensorData> _sensorReadings;
+    private List<ISensorReading> _sensorReadings;
     private String _name;
     private String _uuid;
     private GpsCoordinate _coordinate;
 
-    public HumiditySensor(List<ISensorData> sensorReadings, String name, String uuid, GpsCoordinate coordinate) {
+    public HumiditySensor(List<ISensorReading> sensorReadings, String name, String uuid, GpsCoordinate coordinate) {
         _sensorReadings = sensorReadings;
         _name = name;
         _uuid = uuid;
@@ -41,7 +39,7 @@ public class HumiditySensor implements ISensor {
     }
 
     @Override
-    public List<ISensorData> GetHistoricalData() {
+    public List<ISensorReading> GetHistoricalData() {
         return _sensorReadings;
     }
 }
