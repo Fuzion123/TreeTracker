@@ -10,8 +10,8 @@ import java.util.List;
  * Created by Frederik on 12/9/2017.
  */
 
-public interface ISensorProvider {
-    ISensor GetSensor(String uuid);
-    List<ISensor> GetAllSensors();
-    void setSensorEventListener(ISensorEventListener listener);
+public abstract class BaseSensorProvider implements ISensorEventListener {
+    abstract ISensor GetSensor(String uuid);
+    abstract List<ISensor> GetAllSensors();
+    abstract void setSensorEventListener(ISensorEventListener listener);
 }

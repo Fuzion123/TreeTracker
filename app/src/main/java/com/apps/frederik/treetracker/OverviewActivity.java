@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +25,10 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
 import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.SensorManagement;
+import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
+import com.apps.frederik.treetracker.Model.Util.GpsFakeGenerator;
 import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
 import java.text.ParseException;
 import java.util.List;
@@ -87,6 +92,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     protected void onResume() {
+        Log.d("OverviewActivity", "onResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(onSensorAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_SENSOR_ADDED));
         LocalBroadcastManager.getInstance(this).registerReceiver(onReadingAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
 
@@ -104,14 +110,14 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver onSensorAddedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(OverviewActivity.this, "new sensor Added", Toast.LENGTH_SHORT).show();
+            Log.d("OverviewActivity", "New Sensor Added");
         }
     };
 
     private BroadcastReceiver onReadingAddedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(OverviewActivity.this, "new Reading Added", Toast.LENGTH_SHORT).show();
+            Log.d("OverviewActivity", "New Reading Added");
         }
     };
 
@@ -123,6 +129,20 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (SensorServiceBinder) binder;
             _isBoundToService = true;
+
+            int cnt = FakeDatabaseRepository.UnmappedSensors.size();
+
+            Log.d("TEST", "MappedSensor cnt: " + FakeDatabaseRepository.MappedSensors.size());
+            Log.d("TEST", "Unmapped cnt: " + FakeDatabaseRepository.UnmappedSensors.size());
+
+
+            if(cnt > 0){
+                SensorManagement m = new SensorManagement();
+                m.MapExistingSensor(FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid(), GpsFakeGenerator.GenerateCoordinates());
+            }
+            Log.d("TEST", "MappedSensor cnt: " + FakeDatabaseRepository.MappedSensors.size());
+            Log.d("TEST", "Unmapped cnt: " + FakeDatabaseRepository.UnmappedSensors.size());
+
         }
 
         @Override

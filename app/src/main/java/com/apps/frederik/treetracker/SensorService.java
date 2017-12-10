@@ -11,9 +11,7 @@ import com.apps.frederik.treetracker.Model.FakeSensorModel;
 import com.apps.frederik.treetracker.Model.ISensorModel;
 import com.apps.frederik.treetracker.Model.InternalCommunication.IModelEventListener;
 import com.apps.frederik.treetracker.Model.InternalCommunication.ModelEventArgs;
-import com.apps.frederik.treetracker.Model.Provider.FakeHumiditySensorProvider;
-import com.apps.frederik.treetracker.Model.Provider.ISensorReadingProvider;
-import com.apps.frederik.treetracker.Model.Provider.ISensorProvider;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
 import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 
@@ -33,8 +31,13 @@ public class SensorService extends Service implements IModelEventListener {
     @Override
     public void onCreate() {
         _model = new FakeSensorModel();
-        _model.SetModelEventListener(this);
-
+        try {
+            _model.SetModelEventListener(this);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onCreate();
     }
 
@@ -54,13 +57,11 @@ public class SensorService extends Service implements IModelEventListener {
 
         if(args.Sensor != null){
             ISensor sensor = args.Sensor;
-            Log.d("ModelChanged Test", sensor.GetName());
             broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_SENSOR_ADDED);
         }
 
         else{
             ISensorReading reading = args.Reading;
-            Log.d("ModelChanged Test", reading.GetData().toString());
             broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
         }
 

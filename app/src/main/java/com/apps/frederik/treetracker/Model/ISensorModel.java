@@ -6,6 +6,7 @@ import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorReadingE
 import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -17,5 +18,5 @@ public interface ISensorModel extends ISensorEventListener, ISensorReadingEventL
     List<ISensor> GetAllSensors();
     ISensorReading GetLastReadingFor(String uuid);
     List<ISensorReading> GetAllReadingsFor(String uuid);
-    void SetModelEventListener(IModelEventListener listener);
+    void SetModelEventListener(IModelEventListener listener) throws Exception;
 }

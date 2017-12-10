@@ -1,13 +1,16 @@
 package com.apps.frederik.treetracker.Model;
 
+import android.util.Log;
+
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
 import com.apps.frederik.treetracker.Model.InternalCommunication.IModelEventListener;
 import com.apps.frederik.treetracker.Model.InternalCommunication.ModelEventArgs;
 import com.apps.frederik.treetracker.Model.InternalCommunication.ReadingEventArgs;
 import com.apps.frederik.treetracker.Model.InternalCommunication.SensorEventArgs;
 import com.apps.frederik.treetracker.Model.Provider.FakeHumidityDataProvider;
 import com.apps.frederik.treetracker.Model.Provider.FakeHumiditySensorProvider;
-import com.apps.frederik.treetracker.Model.Provider.ISensorProvider;
-import com.apps.frederik.treetracker.Model.Provider.ISensorReadingProvider;
+import com.apps.frederik.treetracker.Model.Provider.BaseSensorProvider;
+import com.apps.frederik.treetracker.Model.Provider.BaseSensorReadingsProvider;
 import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 
@@ -20,9 +23,8 @@ import java.util.List;
  */
 
 public class FakeSensorModel implements ISensorModel {
-    final int numberOfFakeSensors = 3;
-    final int numberOfFakeReadingsPerSensor = 1;
-    private ISensorProvider _sensorProvider;
+    private FakeHumiditySensorProvider _sensorProvider;
+    private FakeHumidityDataProvider _readingProvider;
     List<ISensor> _sensors = new ArrayList<>();
     IModelEventListener _listener;
 
@@ -69,33 +71,33 @@ public class FakeSensorModel implements ISensorModel {
     }
 
     @Override
-    public void SetModelEventListener(IModelEventListener listener) {
+    public void SetModelEventListener(IModelEventListener listener) throws Exception {
         _listener = listener;
 
-        _sensorProvider = new FakeHumiditySensorProvider(numberOfFakeSensors, this);
+        // sensorProvider setup
+        _sensorProvider = new FakeHumiditySensorProvider();
+        _sensorProvider.setSensorEventListener(this);
+        FakeDatabaseRepository.AddSensorListener(_sensorProvider);
 
-        for (int i = 0; i < numberOfFakeSensors; i++) {
-            _sensors.add(_sensorProvider.GetAllSensors().get(i));
-            ISensorReadingProvider readingsProvider = null;
-            try {
-                readingsProvider = new FakeHumidityDataProvider(numberOfFakeReadingsPerSensor, this);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
 
-            for (int j = 0; j < numberOfFakeReadingsPerSensor; j++) {
-                _sensors.get(i).GetHistoricalData().add(readingsProvider.GetAllReadings("fakeUuid").get(j));
-            }
-        }
+        // sensorReadingsProvider setup
+        _readingProvider = new FakeHumidityDataProvider();
+        _readingProvider.setSensorEventListener(this);
+        FakeDatabaseRepository.AddReadingListener(_readingProvider);
+
+        // generates all the fake data
+        FakeDatabaseRepository.InstantiateFakeRepository();
     }
 
     @Override
     public void onNewSensorAddedEvent(Object sender, SensorEventArgs args) {
+        Log.d("FakeModel", "Sensor Added");
         _listener.onModelChangedEvent(this, new ModelEventArgs(args.Sensor));
     }
 
     @Override
     public void onNewReadingEvent(Object Sender, ReadingEventArgs args) {
+        Log.d("FakeModel", "New Reading");
         _listener.onModelChangedEvent(this, new ModelEventArgs(args.reading));
     }
 }

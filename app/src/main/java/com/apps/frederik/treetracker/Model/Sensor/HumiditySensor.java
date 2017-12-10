@@ -39,6 +39,11 @@ public class HumiditySensor implements ISensor {
     }
 
     @Override
+    public void SetGpsCoordinate(GpsCoordinate coordinate) {
+        _coordinate = coordinate;
+    }
+
+    @Override
     public List<ISensorReading> GetHistoricalData() {
         return _sensorReadings;
     }

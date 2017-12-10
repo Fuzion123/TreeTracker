@@ -5,5 +5,5 @@ package com.apps.frederik.treetracker.Model.InternalCommunication;
  */
 
 public interface ISensorEventListener {
-    void onNewSensorAddedEvent(Object sender, SensorEventArgs sensor);
+    void onNewSensorAddedEvent(Object sender, SensorEventArgs args) throws Exception;
 }

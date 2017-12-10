@@ -13,5 +13,6 @@ public interface ISensor {
     String GetName();
     String GetUuid();
     GpsCoordinate GetCoordinate();
+    void SetGpsCoordinate(GpsCoordinate coordinate);
     List<ISensorReading> GetHistoricalData();
 }

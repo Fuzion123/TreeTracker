@@ -9,8 +9,8 @@ import java.util.List;
  * Created by Frederik on 12/9/2017.
  */
 
-public interface ISensorReadingProvider {
-    ISensorReading GetLastReading(String uuid);
-    List<ISensorReading> GetAllReadings(String uuid);
-    void setSensorEventListener(ISensorReadingEventListener listener);
+public abstract class BaseSensorReadingsProvider implements ISensorReadingEventListener {
+    abstract ISensorReading GetLastReading(String uuid);
+    abstract List<ISensorReading> GetAllReadings(String uuid);
+    abstract void setSensorEventListener(ISensorReadingEventListener listener);
 }

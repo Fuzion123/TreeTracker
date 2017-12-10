@@ -1,61 +1,30 @@
 package com.apps.frederik.treetracker.Model.Provider;
 
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
 import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorReadingEventListener;
 import com.apps.frederik.treetracker.Model.InternalCommunication.ReadingEventArgs;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.HumidityReading;
+import com.apps.frederik.treetracker.Model.Sensor.ISensor;
 import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
-import com.apps.frederik.treetracker.Model.Util.TimeStamp;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Frederik on 12/9/2017.
  */
 
-public class FakeHumidityDataProvider implements ISensorReadingProvider {
-    Random _random = new Random();
-    List<ISensorReading> _readings = new ArrayList<>();
+public class FakeHumidityDataProvider extends BaseSensorReadingsProvider {
     ISensorReadingEventListener _listener;
 
-    public FakeHumidityDataProvider(int readingCount, ISensorReadingEventListener listener) throws ParseException {
-        _listener = listener;
-
-        for (int i = 0; i < readingCount; i++) {
-            ISensorReading reading = GenerateFakeData();
-            _readings.add(reading);
-
-            if(_listener != null){
-                _listener.onNewReadingEvent(this, new ReadingEventArgs(reading));
+    public List<ISensorReading> GetAllReadings(String uuid) {
+        for (ISensor sensor: FakeDatabaseRepository.MappedSensors) {
+            if(sensor.GetUuid().equals(uuid)){
+                return sensor.GetHistoricalData();
+            }
+            else{
+                return null;
             }
         }
-    }
-
-    private HumidityReading GenerateFakeData() throws ParseException {
-        int readingValue = _random.nextInt(100);
-        TimeStamp timeStamp = GenerateFakeTimeStamp();
-
-        return new HumidityReading(readingValue, timeStamp);
-    }
-
-    private TimeStamp GenerateFakeTimeStamp() throws ParseException {
-        //Date dateLowerRange = new Date();
-        //Date dateUpperRange = new Date();
-
-        String dateInString = "01/01/2017/13:45:30";
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy/hh:mm:ss");
-        Date parsedDate = formatter.parse(dateInString);
-
-        return new TimeStamp(parsedDate);
-    }
-
-    public List<ISensorReading> GetAllReadings(String uuid) {
-        return _readings;
+        return null;
     }
 
     @Override
@@ -65,9 +34,24 @@ public class FakeHumidityDataProvider implements ISensorReadingProvider {
 
     @Override
     public ISensorReading GetLastReading(String uuid) {
-        if(_readings.size() == 0) return null;
-        return _readings.get(_readings.size()-1);
+        for (int i = 0; i < FakeDatabaseRepository.MappedSensors.size(); i++) {
+            ISensor sensor = FakeDatabaseRepository.MappedSensors.get(i);
+
+            if(sensor.GetUuid().equals(uuid)){
+                int cnt = sensor.GetHistoricalData().size();
+
+                if(cnt == 0) return null;
+                return sensor.GetHistoricalData().get(cnt-1); // returns the last element of the list which equals to the last reading of the senso
+            }
+        }
+        return null;
     }
 
-
+    @Override
+    public void onNewReadingEvent(Object Sender, ReadingEventArgs args) {
+        // fires event that new reading was added!
+        if(_listener != null){
+            _listener.onNewReadingEvent(this, new ReadingEventArgs(args.reading));
+        }
+    }
 }

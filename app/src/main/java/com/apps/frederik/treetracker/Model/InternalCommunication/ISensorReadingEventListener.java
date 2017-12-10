@@ -5,5 +5,5 @@ package com.apps.frederik.treetracker.Model.InternalCommunication;
  */
 
 public interface ISensorReadingEventListener {
-    void onNewReadingEvent(Object Sender, ReadingEventArgs reading);
+    void onNewReadingEvent(Object Sender, ReadingEventArgs args);
 }
