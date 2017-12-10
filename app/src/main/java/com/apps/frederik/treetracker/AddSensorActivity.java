@@ -108,14 +108,14 @@ public class AddSensorActivity extends AppCompatActivity {
         double currentLatitude = lastKnownLocation.getLatitude();
         GpsCoordinate gpsCoordinate = new GpsCoordinate(currentLatitude, currentLongitude);
 
-        SensorManagement manager = new SensorManagement();
-
-        int cnt = FakeDatabaseRepository.UnmappedSensors.size();
-
         // TODO dont do this check heheheheh
+        SensorManagement manager = new SensorManagement();
+        int cnt = FakeDatabaseRepository.UnmappedSensors.size();
         if(cnt == 0){
-            finish();
+            finish(); // ops: finish doesnt necessarily return from method!
+            return;
         }
+
         String uuid = FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid();
         SensorManagement.MapSensorResult result = manager.MapExistingSensor(uuid, gpsCoordinate);
 
@@ -133,7 +133,6 @@ public class AddSensorActivity extends AppCompatActivity {
                 break;
             }
         }
-
         finish();
     }
 

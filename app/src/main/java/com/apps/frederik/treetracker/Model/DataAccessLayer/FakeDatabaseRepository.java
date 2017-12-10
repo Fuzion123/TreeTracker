@@ -29,7 +29,7 @@ import static java.util.UUID.randomUUID;
 final public class FakeDatabaseRepository {
     private static boolean isInstantiated = false;
     private static Random _random = new Random();
-    private static int _numberOfSensors = 10;
+    private static int _numberOfSensors = 2;
     private static int _numberOfReadingsPerSensor = 5;
     private static List<ISensorEventListener> _sensorListeners = new ArrayList<>();
     private static List<ISensorReadingEventListener> _readingListeners = new ArrayList<>();

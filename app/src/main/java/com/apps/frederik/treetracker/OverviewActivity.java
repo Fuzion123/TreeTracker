@@ -129,20 +129,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (SensorServiceBinder) binder;
             _isBoundToService = true;
-
-            int cnt = FakeDatabaseRepository.UnmappedSensors.size();
-
-            Log.d("TEST", "MappedSensor cnt: " + FakeDatabaseRepository.MappedSensors.size());
-            Log.d("TEST", "Unmapped cnt: " + FakeDatabaseRepository.UnmappedSensors.size());
-
-
-            if(cnt > 0){
-                SensorManagement m = new SensorManagement();
-                m.MapExistingSensor(FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid(), GpsFakeGenerator.GenerateCoordinates());
-            }
-            Log.d("TEST", "MappedSensor cnt: " + FakeDatabaseRepository.MappedSensors.size());
-            Log.d("TEST", "Unmapped cnt: " + FakeDatabaseRepository.UnmappedSensors.size());
-
         }
 
         @Override
