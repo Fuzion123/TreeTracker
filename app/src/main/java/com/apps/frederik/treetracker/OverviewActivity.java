@@ -20,14 +20,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
 import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
 import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
+import java.text.ParseException;
+import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
     private SensorServiceBinder _binder;
     private boolean _isBoundToService;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +40,15 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(OverviewActivity.this, AddSensorActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -180,6 +187,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {

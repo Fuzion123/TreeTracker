@@ -19,4 +19,9 @@
     <string name="barcode_success">Barcode read successfully</string>
     <string name="barcode_failure">No barcode captured</string>
     <string name="barcode_error">"Error reading barcode: %1$s"</string>
+    <string name="title_activity_add_sensor">AddSensorActivity</string>
+    <string name="hint_name_of_new_sensor">Name of Sensor...</string>
+    <string name="text_scan_code_of_sensor">Press Camera to Scan Code of Sensor</string>
+    <string name="text_give_sensor_a_name">Give the Sensor a Name</string>
+    <string name="button_add_sensor">Add Sensor \u2713</string>
 </resources>
