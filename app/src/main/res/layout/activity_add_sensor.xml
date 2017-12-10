@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.apps.frederik.treetracker.OverviewActivity">
+    tools:context="com.apps.frederik.treetracker.AddSensorActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,17 +21,21 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_overview" />
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_add_sensor" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="86dp"
-        android:layout_height="77dp"
+        android:layout_width="87dp"
+        android:layout_height="86dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@color/colorPrimary"
-        app:srcCompat="@drawable/tree"
-        tools:layout_editor_absoluteX="282dp"
-        tools:layout_editor_absoluteY="474dp" />
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="right|center"
+        app:srcCompat="@android:drawable/ic_menu_camera"
+        tools:layout_editor_absoluteX="281dp"
+        tools:layout_editor_absoluteY="465dp" />
 
 </android.support.design.widget.CoordinatorLayout>

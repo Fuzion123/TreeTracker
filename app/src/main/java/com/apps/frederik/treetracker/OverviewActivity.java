@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -35,9 +36,6 @@ import java.util.List;
 public class OverviewActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
 
-    private static final int RC_BARCODE_CAPTURE = 1234;
-    private static final String TAG = "OverviewActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +43,15 @@ public class OverviewActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OverviewActivity.this, BarcodeCaptureActivity.class);
-                startActivityForResult(intent, RC_BARCODE_CAPTURE);
+                Intent intent = new Intent(OverviewActivity.this, AddSensorActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -162,23 +163,7 @@ public class OverviewActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_BARCODE_CAPTURE) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                    Toast.makeText(this, "Now Tracking: "+barcode.displayValue, Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
-                } else {
-                    Log.d(TAG, "No barcode captured, intent data is null");
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
+
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
