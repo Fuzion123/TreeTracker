@@ -27,8 +27,8 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="129dp"
-        android:layout_height="110dp"
+        android:layout_width="177dp"
+        android:layout_height="157dp"
         android:adjustViewBounds="false"
         android:background="@color/colorPrimaryDark"
         android:contentDescription="@string/content_description_add_sensor_with_this_button"
@@ -37,6 +37,7 @@
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="center"
         app:srcCompat="@android:drawable/ic_menu_camera"
-        tools:layout_editor_absoluteX="133dp" />
+        tools:layout_editor_absoluteX="159dp"
+        tools:layout_editor_absoluteY="98dp" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -5,12 +5,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_add_sensor">AddSensorActivity</string>
-    <string name="hint_name_of_new_sensor">Name of Sensor&#8230;</string>
-    <string name="text_scan_code_of_sensor">Press Camera to Scan Code of Sensor</string>
-    <string name="text_give_sensor_a_name">Give the Sensor a Name</string>
+    <string name="title_activity_add_sensor">Add a TreeTracker</string>
+    <string name="hint_name_of_new_sensor">Name of TreeTracker&#8230;</string>
+    <string name="text_scan_code_of_sensor">Press camera to scan TreeTracker code</string>
+    <string name="text_give_sensor_a_name">Give this TreeTracker a name</string>
     <!-- Tick mark found on: https://stackoverflow.com/questions/5579780/add-tick-mark-to-string-xml -->
-    <string name="button_add_sensor">Add Sensor \u2713</string>
+    <string name="button_add_sensor">Add TreeTracker \u2713</string>
     <string name="content_description_add_sensor_with_this_button">Add Sensor with this button</string>
 
     <!-- Google Vision API strings: https://developers.google.com/vision/introduction -->

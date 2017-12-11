@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +32,8 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.util.ArrayList;
+
 public class AddSensorActivity extends AppCompatActivity {
 
     private static final int RC_BARCODE_CAPTURE = 1234;
@@ -38,6 +43,7 @@ public class AddSensorActivity extends AppCompatActivity {
     private Button buttonAddSensor;
     private EditText editTextSensorName;
     private TextView textViewInformationToUser, textViewUUIDKey, textViewUUIDValue, textViewLocationPermission;
+    private ImageView imageViewTree;
     private ImageButton imageButton;
 
     private String uuid = "";
@@ -61,16 +67,35 @@ public class AddSensorActivity extends AppCompatActivity {
         textViewUUIDKey = findViewById(R.id.textViewUUIDKey);
         textViewUUIDValue = findViewById(R.id.textViewUUIDValue);
         textViewLocationPermission = findViewById(R.id.textViewLocationPermission);
+        imageViewTree = findViewById(R.id.imageViewTree);
 
-         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        //Setup state of buttons and text fields
-        imageButton.setVisibility(View.VISIBLE);
-        buttonAddSensor.setVisibility(View.INVISIBLE);
-        editTextSensorName.setVisibility(View.INVISIBLE);
-        textViewUUIDKey.setVisibility(View.INVISIBLE);
-        textViewUUIDValue.setVisibility(View.INVISIBLE);
-        textViewLocationPermission.setVisibility(View.INVISIBLE);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getString("UUID_VALUE").length() == 0) {
+                imageButton.setVisibility(View.VISIBLE);
+                buttonAddSensor.setVisibility(View.INVISIBLE);
+                editTextSensorName.setVisibility(View.INVISIBLE);
+                textViewUUIDKey.setVisibility(View.INVISIBLE);
+                textViewUUIDValue.setVisibility(View.INVISIBLE);
+                textViewLocationPermission.setVisibility(View.INVISIBLE);
+                imageViewTree.setVisibility(View.INVISIBLE);
+            }
+            else{
+                imageButton.setVisibility(View.INVISIBLE);
+                textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
+                textViewUUIDValue.setText(savedInstanceState.getString("UUID_VALUE"));
+            }
+        }
+        else{
+            imageButton.setVisibility(View.VISIBLE);
+            buttonAddSensor.setVisibility(View.INVISIBLE);
+            editTextSensorName.setVisibility(View.INVISIBLE);
+            textViewUUIDKey.setVisibility(View.INVISIBLE);
+            textViewUUIDValue.setVisibility(View.INVISIBLE);
+            textViewLocationPermission.setVisibility(View.INVISIBLE);
+            imageViewTree.setVisibility(View.INVISIBLE);
+        }
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +126,18 @@ public class AddSensorActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        locationManager.removeUpdates(locationListener);
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("UUID_VALUE", textViewUUIDValue.getText().toString());
+        super.onSaveInstanceState(outState);
+    }
+
     private void FinalizeAddingSensor(){
         if (!checkLocationPermission())
             return;
@@ -117,7 +154,7 @@ public class AddSensorActivity extends AppCompatActivity {
             return;
         }
 
-        String uuid = FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid();
+        uuid = FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid();
         SensorManagement.MapSensorResult result = manager.MapExistingSensor(uuid, gpsCoordinate);
 
         switch (result){
@@ -166,13 +203,6 @@ public class AddSensorActivity extends AppCompatActivity {
         }
     };
 
-
-    @Override
-    protected void onStop() {
-        locationManager.removeUpdates(locationListener);
-        super.onStop();
-    }
-
     private void requestLocationPermission() {
         Log.w(TAG, "Location permission is not granted. Requesting permission");
 
@@ -216,6 +246,7 @@ public class AddSensorActivity extends AppCompatActivity {
                     textViewUUIDKey.setVisibility(View.VISIBLE);
                     textViewUUIDValue.setVisibility(View.VISIBLE);
                     textViewLocationPermission.setVisibility(View.VISIBLE);
+                    imageViewTree.setVisibility(View.VISIBLE);
                     textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
                     textViewUUIDValue.setText(barcode.displayValue);
                     uuid = barcode.displayValue;
