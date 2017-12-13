@@ -1,5 +1,7 @@
 package com.apps.frederik.treetracker;
 
+import android.app.FragmentManager;
+import android.app.ListFragment;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +40,9 @@ import java.util.List;
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
     private SensorServiceBinder _binder;
     private boolean _isBoundToService;
+    private android.support.v4.app.Fragment _currentFragement;
+    private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
+    private final String FRAGMENT_MAP_TAG = "com.apps.frederik.treetracker.mapFragment";
 
 
     @Override
@@ -74,16 +80,11 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 return;
             }
 
-            //SensorListFragment listFragment = new SensorListFragment();
-            //getSupportFragmentManager().beginTransaction()
-              //      .add(R.id.fragment_container, listFragment).commit();
-
-            // TODO coment in the listView if desired!
-            MapFragment mapFragment = new MapFragment();
+            _currentFragement = new SensorListFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, mapFragment).commit();
-
-
+                    .add(R.id.fragment_container, _currentFragement, FRAGMENT_LIST_TAG)
+                    .addToBackStack(FRAGMENT_LIST_TAG) // previous state will be added to the backstack allowing you to go back with the back button. cite from: https://stackoverflow.com/questions/14354885/android-fragments-backstack
+                    .commit();
         }
 
         Intent intentService = new Intent(this, SensorService.class);
@@ -177,32 +178,58 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         return super.onOptionsItemSelected(item);
     }
 
+    // inspired from: https://guides.codepath.com/android/fragment-navigation-drawer
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Class fragmentClass;
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        // TODO all other menu items displayed are nmot yet implemented, resulting in no reponse
+        if (id == R.id.nav_listFragment) {
+            fragmentClass = SensorListFragment.class;
+            InstantiateFragment(FRAGMENT_LIST_TAG, fragmentClass);
+        } else if (id == R.id.nav_mapFragment) {
+            fragmentClass = MapFragment.class;
+            InstantiateFragment(FRAGMENT_MAP_TAG, fragmentClass);
+        } else{
+            fragmentClass = SensorListFragment.class; // default behavior!
+            InstantiateFragment(FRAGMENT_LIST_TAG, fragmentClass);
         }
 
+        item.setChecked(true);
+        setTitle(item.getTitle());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
 
+    private void InstantiateFragment(String fragmentTag, Class fragmentClass){
+        // used to hide the current fragment
+        String currentFragmentActive = (fragmentTag.equals(FRAGMENT_LIST_TAG) ? FRAGMENT_MAP_TAG : FRAGMENT_LIST_TAG);
+
+        // inspired from: https://stackoverflow.com/questions/22713128/how-can-i-switch-between-two-fragments-without-recreating-the-fragments-each-ti
+        if(getSupportFragmentManager().findFragmentByTag(fragmentTag) != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .hide(getSupportFragmentManager().findFragmentByTag(currentFragmentActive)) // should hide automatically when showing another fragment, but map view does not hide for some reason.
+                    .show(getSupportFragmentManager().findFragmentByTag(fragmentTag))
+                    .commit();
+        } else {
+            Fragment fragment;
+            try{
+                fragment = (Fragment) fragmentClass.newInstance();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment, fragmentTag)
+                        .addToBackStack(fragmentTag)
+                        .commit();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
