@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
 import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
+import com.apps.frederik.treetracker.MapFragment.MapFragment;
 import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
 import com.apps.frederik.treetracker.Model.DataAccessLayer.SensorManagement;
 import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
@@ -73,9 +74,16 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 return;
             }
 
-            SensorListFragment listFragment = new SensorListFragment();
+            //SensorListFragment listFragment = new SensorListFragment();
+            //getSupportFragmentManager().beginTransaction()
+              //      .add(R.id.fragment_container, listFragment).commit();
+
+            // TODO coment in the listView if desired!
+            MapFragment mapFragment = new MapFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, listFragment).commit();
+                    .add(R.id.fragment_container, mapFragment).commit();
+
+
         }
 
         Intent intentService = new Intent(this, SensorService.class);
