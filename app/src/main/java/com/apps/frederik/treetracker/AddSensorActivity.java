@@ -5,12 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,14 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.SensorManagement;
-import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
+import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
-
-import java.util.ArrayList;
 
 public class AddSensorActivity extends AppCompatActivity {
 
@@ -144,8 +138,10 @@ public class AddSensorActivity extends AppCompatActivity {
         lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
         double currentLongitude = lastKnownLocation.getLongitude();
         double currentLatitude = lastKnownLocation.getLatitude();
-        GpsCoordinate gpsCoordinate = new GpsCoordinate(currentLatitude, currentLongitude);
+        Coordinate gpsCoordinate = new Coordinate(currentLatitude, currentLongitude);
 
+        // TODO update this
+        /*
         // TODO dont do this check heheheheh
         SensorManagement manager = new SensorManagement();
         int cnt = FakeDatabaseRepository.UnmappedSensors.size();
@@ -171,6 +167,7 @@ public class AddSensorActivity extends AppCompatActivity {
                 break;
             }
         }
+        */
         finish();
     }
 

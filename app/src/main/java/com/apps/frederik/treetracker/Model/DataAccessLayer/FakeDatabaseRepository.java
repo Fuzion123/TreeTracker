@@ -2,15 +2,7 @@ package com.apps.frederik.treetracker.Model.DataAccessLayer;
 
 import android.util.Log;
 
-import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorEventListener;
-import com.apps.frederik.treetracker.Model.InternalCommunication.ISensorReadingEventListener;
-import com.apps.frederik.treetracker.Model.InternalCommunication.ReadingEventArgs;
-import com.apps.frederik.treetracker.Model.InternalCommunication.SensorEventArgs;
-import com.apps.frederik.treetracker.Model.Sensor.HumiditySensor;
-import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.HumidityReading;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
-import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
+import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.apps.frederik.treetracker.Model.Util.GpsFakeGenerator;
 import com.apps.frederik.treetracker.Model.Util.TimeStamp;
 import com.apps.frederik.treetracker.Model.Util.TimestampFakeGenerator;
@@ -27,14 +19,16 @@ import static java.util.UUID.randomUUID;
  */
 
 final public class FakeDatabaseRepository {
+
+    /*
     private static boolean isInstantiated = false;
     private static Random _random = new Random();
     private static int _numberOfSensors = 2;
     private static int _numberOfReadingsPerSensor = 5;
     private static List<ISensorEventListener> _sensorListeners = new ArrayList<>();
     private static List<ISensorReadingEventListener> _readingListeners = new ArrayList<>();
-    public static List<ISensor> UnmappedSensors = new ArrayList<>();
-    public static List<ISensor> MappedSensors = new ArrayList<>();
+    public static List<IMonitoredProperty> UnmappedSensors = new ArrayList<>();
+    public static List<IMonitoredProperty> MappedSensors = new ArrayList<>();
     public static List<String> Uuids = new ArrayList<>();
 
     public static void InstantiateFakeRepository() throws Exception {
@@ -43,16 +37,16 @@ final public class FakeDatabaseRepository {
 
         for (int i = 0; i < _numberOfSensors; i++) {
 
-            String sensorName = "HumiditySensor ".concat(String.valueOf(i));
+            String sensorName = "Humidity ".concat(String.valueOf(i));
             String uuid = randomUUID().toString();
             Uuids.add(uuid);
 
-            ISensor newSensor = new HumiditySensor(new ArrayList<ISensorReading>(), sensorName, uuid, null);
+            IMonitoredProperty newSensor = new Humidity(new ArrayList<IReading>(), sensorName, uuid, null);
 
             // adds fake historical data
             for (int j = 0; j < _numberOfReadingsPerSensor; j++) {
-                ISensorReading newReading = GenerateFakeData();
-                newSensor.GetHistoricalData().add(newReading);
+                IReading newReading = GenerateFakeData();
+                newSensor.GetHistoricalReadings().add(newReading);
 
                 for (ISensorReadingEventListener listener: _readingListeners) {
                     listener.onNewReadingEvent(new Object(), new ReadingEventArgs(newReading));
@@ -60,7 +54,7 @@ final public class FakeDatabaseRepository {
             }
 
             if(shouldBeMapped){
-                GpsCoordinate coordinate = GpsFakeGenerator.GenerateCoordinates();
+                Coordinate coordinate = GpsFakeGenerator.GenerateCoordinates();
                 newSensor.SetGpsCoordinate(coordinate);
                 MappedSensors.add(newSensor);
 
@@ -105,4 +99,5 @@ final public class FakeDatabaseRepository {
 
         return new HumidityReading(readingValue, timeStamp);
     }
+    */
 }

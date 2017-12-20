@@ -1,7 +1,5 @@
 package com.apps.frederik.treetracker;
 
-import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +9,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -24,17 +21,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
 import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
 import com.apps.frederik.treetracker.MapFragment.MapFragment;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.SensorManagement;
-import com.apps.frederik.treetracker.Model.Util.GpsCoordinate;
-import com.apps.frederik.treetracker.Model.Util.GpsFakeGenerator;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
-import java.text.ParseException;
+
 import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
@@ -51,9 +45,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         setContentView(R.layout.activity_overview);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

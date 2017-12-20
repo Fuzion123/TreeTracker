@@ -71,6 +71,7 @@ public class SensorListFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             recyclerView.setAdapter(new MySensorRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
         return view;
     }

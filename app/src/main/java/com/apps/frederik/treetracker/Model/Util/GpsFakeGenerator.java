@@ -9,7 +9,7 @@ import java.util.Random;
 public final class GpsFakeGenerator {
     private static final Random _random = new Random();
 
-    public static GpsCoordinate GenerateCoordinates(){
+    public static Coordinate GenerateCoordinates(){
         double latRangeMin = AarhusLatitudeLongitudeConstrains.LatitudeLowerBound;
         double latRangeMax= AarhusLatitudeLongitudeConstrains.LatitudeUpperBound;
         double longRangeMin = AarhusLatitudeLongitudeConstrains.LongitudeLeftBound;
@@ -20,6 +20,6 @@ public final class GpsFakeGenerator {
         double latitude = latRangeMin + (latRangeMax - latRangeMin) * _random.nextDouble();
         double longitude = longRangeMin + (longRangeMax - longRangeMin) * _random.nextDouble();
 
-        return new GpsCoordinate(latitude, longitude);
+        return new Coordinate(latitude, longitude);
     }
 }

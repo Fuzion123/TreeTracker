@@ -1,28 +1,29 @@
 package com.apps.frederik.treetracker.Model.InternalCommunication;
 
-import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 
 /**
  * Created by Frederik on 12/10/2017.
  */
 
+/*
 public class ModelEventArgs {
-    public final ISensor Sensor;
-    public final ISensorReading Reading;
+    public final IMonitoredProperty Sensor;
+    public final IReading Reading;
 
-    public ModelEventArgs(ISensor sensor, ISensorReading reading){
+    public ModelEventArgs(IMonitoredProperty sensor, IReading reading){
         this.Sensor = sensor;
         this.Reading = reading;
     }
 
-    public ModelEventArgs(ISensor sensor){
+    public ModelEventArgs(IMonitoredProperty sensor){
         this.Sensor = sensor;
         this.Reading = null;
     }
 
-    public ModelEventArgs(ISensorReading reading){
+    public ModelEventArgs(IReading reading){
         this.Sensor = null;
         this.Reading = reading;
     }
+
 }
+*/

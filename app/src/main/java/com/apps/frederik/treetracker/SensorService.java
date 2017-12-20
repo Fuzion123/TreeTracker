@@ -4,24 +4,18 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.apps.frederik.treetracker.Model.FakeSensorModel;
-import com.apps.frederik.treetracker.Model.ISensorModel;
-import com.apps.frederik.treetracker.Model.InternalCommunication.IModelEventListener;
-import com.apps.frederik.treetracker.Model.InternalCommunication.ModelEventArgs;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
-import com.apps.frederik.treetracker.Model.Sensor.ISensor;
-import com.apps.frederik.treetracker.Model.Sensor.SensorData.ISensorReading;
 
-import java.text.ParseException;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class SensorService extends Service implements IModelEventListener {
-    private List<ISensor> _sensors;
+public class SensorService extends Service {//implements IModelEventListener {
+    private List<MonitoredObject> _objects = new ArrayList<>();
     private IBinder _sensorBinder = new SensorServiceBinder();
-    private ISensorModel _model;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,14 +24,7 @@ public class SensorService extends Service implements IModelEventListener {
 
     @Override
     public void onCreate() {
-        _model = new FakeSensorModel();
-        try {
-            _model.SetModelEventListener(this);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        _objects = new FakeRepository(this).GenerateFakeModel();
         super.onCreate();
     }
 
@@ -51,41 +38,44 @@ public class SensorService extends Service implements IModelEventListener {
         return super.onUnbind(intent);
     }
 
+    /*
     @Override
     public void onModelChangedEvent(Object sender, ModelEventArgs args) {
         Intent broadcast;
 
         if(args.Sensor != null){
-            ISensor sensor = args.Sensor;
+            IMonitoredProperty sensor = args.Sensor;
             broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_SENSOR_ADDED);
         }
 
         else{
-            ISensorReading reading = args.Reading;
+            IReading reading = args.Reading;
             broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
         }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
     }
+    */
 
 
     public class SensorServiceBinder extends Binder {
-
-        ISensor GetSensorFor(String uuid){
-            return _model.GetSensorFor(uuid);
+        MonitoredObject GetMonitoredObjectFor(String uuid)
+        {
+            return GetMoniToredObjectFor(uuid);
         }
 
-        List<ISensor> GetAllSensors(){
-            return _model.GetAllSensors();
-        }
-
-        ISensorReading GetLastReadingFor(String uuid){
-            return _model.GetLastReadingFor(uuid);
-        }
-
-        List<ISensorReading> GetAllReadingsFor(String uuid){
-            return _model.GetAllReadingsFor(uuid);
+        List<MonitoredObject> GetAllMonitoredObjects(){
+            return _objects;
         }
     }
 
+    private MonitoredObject GetMoniToredObjectFor(String uuid){
+        int cnt = _objects.size();
+        for (int i = 0; i < cnt; i++){
+            if(_objects.get(i).getUUID().equals(uuid)){
+                return _objects.get(i);
+            }
+        }
+        return null;
+    }
 }
