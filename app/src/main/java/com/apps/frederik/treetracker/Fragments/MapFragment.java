@@ -1,4 +1,4 @@
-package com.apps.frederik.treetracker.MapFragment;
+package com.apps.frederik.treetracker.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

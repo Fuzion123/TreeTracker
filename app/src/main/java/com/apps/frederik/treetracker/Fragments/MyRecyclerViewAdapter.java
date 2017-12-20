@@ -1,0 +1,71 @@
+package com.apps.frederik.treetracker.Fragments;
+
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+import com.apps.frederik.treetracker.R;
+import java.util.List;
+
+public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.MonitoredObjectViewHolder> {
+
+    private List<MonitoredObject> mValues;
+    private final ListFragment.OnListFragmentInteractionListener mListener;
+
+    public MyRecyclerViewAdapter(List<MonitoredObject> items, ListFragment.OnListFragmentInteractionListener listener) {
+        mValues = items;
+        mListener = listener;
+    }
+
+    @Override
+    public MonitoredObjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.fragment_sensor, parent, false);
+        return new MonitoredObjectViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final MonitoredObjectViewHolder holder, int position) {
+        holder.mItem = mValues.get(position);
+        holder.mDiscriptionView.setText(mValues.get(position).getDescription());
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onListFragmentInteraction(holder.mItem);
+                }
+            }
+        });
+    }
+
+    public void UpdateList(List<MonitoredObject> objects){
+        mValues = objects;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mValues.size();
+    }
+
+    public class MonitoredObjectViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView mDiscriptionView;
+        public MonitoredObject mItem;
+
+        public MonitoredObjectViewHolder(View view) {
+            super(view);
+            mView = view;
+            mDiscriptionView = (TextView) view.findViewById(R.id.content);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + mDiscriptionView.getText() + "'";
+        }
+    }
+}

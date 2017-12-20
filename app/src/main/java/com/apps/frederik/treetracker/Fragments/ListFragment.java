@@ -1,4 +1,4 @@
-package com.apps.frederik.treetracker.ListFragment;
+package com.apps.frederik.treetracker.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,10 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.R;
-import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
-import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent.DummyItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,25 +23,25 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class SensorListFragment extends Fragment {
-
+public class ListFragment extends MonitoredObjectFragment implements IActivityToFragmentCommunication {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private RecyclerView _recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SensorListFragment() {
+    public ListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static SensorListFragment newInstance(int columnCount) {
-        SensorListFragment fragment = new SensorListFragment();
+    public static ListFragment newInstance(int columnCount) {
+        ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -64,14 +65,13 @@ public class SensorListFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            _recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                _recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                _recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MySensorRecyclerViewAdapter(DummyContent.ITEMS, mListener));
-            recyclerView.getAdapter().notifyDataSetChanged();
+            _recyclerView.setAdapter(new MyRecyclerViewAdapter(new ArrayList<MonitoredObject>(), mListener));
         }
         return view;
     }
@@ -94,6 +94,12 @@ public class SensorListFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void SetMonitoredObjects(List<MonitoredObject> objects) {
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).UpdateList(objects);
+        _recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -106,6 +112,6 @@ public class SensorListFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(MonitoredObject item);
     }
 }

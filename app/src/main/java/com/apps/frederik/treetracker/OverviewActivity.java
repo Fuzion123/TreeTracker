@@ -22,19 +22,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.apps.frederik.treetracker.ListFragment.SensorListFragment;
-import com.apps.frederik.treetracker.ListFragment.dummy.DummyContent;
-import com.apps.frederik.treetracker.MapFragment.MapFragment;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
+
+import com.apps.frederik.treetracker.Fragments.IActivityToFragmentCommunication;
+import com.apps.frederik.treetracker.Fragments.ListFragment;
+import com.apps.frederik.treetracker.Fragments.MapFragment;
+import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
 
 import java.util.List;
 
-public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, SensorListFragment.OnListFragmentInteractionListener {
+public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private SensorServiceBinder _binder;
     private boolean _isBoundToService;
-    private android.support.v4.app.Fragment _currentFragement;
+    private MonitoredObjectFragment _currentFragement;
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
     private final String FRAGMENT_MAP_TAG = "com.apps.frederik.treetracker.mapFragment";
 
@@ -71,7 +72,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 return;
             }
 
-            _currentFragement = new SensorListFragment();
+            _currentFragement = new ListFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, _currentFragement, FRAGMENT_LIST_TAG)
                     .addToBackStack(FRAGMENT_LIST_TAG) // previous state will be added to the backstack allowing you to go back with the back button. cite from: https://stackoverflow.com/questions/14354885/android-fragments-backstack
@@ -128,6 +129,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (SensorServiceBinder) binder;
+
+            List<MonitoredObject> objects = _binder.GetAllMonitoredObjects();
+            _currentFragement.SetMonitoredObjects(objects);
             _isBoundToService = true;
         }
 
@@ -179,13 +183,13 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         // TODO all other menu items displayed are nmot yet implemented, resulting in no reponse
         if (id == R.id.nav_listFragment) {
-            fragmentClass = SensorListFragment.class;
+            fragmentClass = ListFragment.class;
             InstantiateFragment(FRAGMENT_LIST_TAG, fragmentClass);
         } else if (id == R.id.nav_mapFragment) {
             fragmentClass = MapFragment.class;
             InstantiateFragment(FRAGMENT_MAP_TAG, fragmentClass);
         } else{
-            fragmentClass = SensorListFragment.class; // default behavior!
+            fragmentClass = ListFragment.class; // default behavior!
             InstantiateFragment(FRAGMENT_LIST_TAG, fragmentClass);
         }
 
@@ -223,7 +227,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-        Toast.makeText(this, "Item Details: " + item.details, Toast.LENGTH_SHORT).show();
+    public void onListFragmentInteraction(MonitoredObject item) {
+        Toast.makeText(this, "Monitored UUID: " + item.getUUID(), Toast.LENGTH_SHORT).show();
     }
 }

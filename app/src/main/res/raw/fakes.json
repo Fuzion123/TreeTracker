@@ -3,7 +3,7 @@
     "Latitude" : 56.172613,
     "Longitude" : 10.190612
   },
-  "Description" : "good old lemon tree",
+  "Description" : "Good old lemon tree",
   "MonitoredProperties" : [ {
     "Identifier" : "Humidity",
     "Readings" : [ {
@@ -14,16 +14,16 @@
   "UUID" : "very_secret_UUID"
 }, {
   "Coordinate" : {
-    "Latitude" : 56.172613,
-    "Longitude" : 10.190612
+    "Latitude" : 56.173533,
+    "Longitude" : 10.142427
   },
-  "Description" : "good old lemon tree",
+  "Description" : "Christmas Tree",
   "MonitoredProperties" : [ {
     "Identifier" : "Humidity",
     "Readings" : [ {
-      "Data" : 0.4,
+      "Data" : 0.7,
       "TimeStamp" : 12202017013125
     } ]
   } ],
-  "UUID" : "very_very_secret"
+  "UUID" : "very_very_secret_UUID"
 } ]
