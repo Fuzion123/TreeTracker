@@ -1,0 +1,14 @@
+{
+  "Coordinate" : {
+    "Latitude" : 56.172613,
+    "Longitude" : 10.190612
+  },
+  "Description" : "good old lemon tree",
+  "MonitoredProperties" : [ {
+    "Identifier" : "Humidity",
+    "Readings" : [ {
+      "Data" : 0.4,
+      "TimeStamp" : 12202017013125
+    } ]
+  } ]
+}
