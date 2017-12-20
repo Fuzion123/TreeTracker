@@ -34,11 +34,12 @@ public class FakeRepository {
         String jsonString = JSONReader(_contest);
         Gson gson = new GsonBuilder().create();
         Type listMonitoredObjects = new TypeToken<ArrayList<MonitoredObject>>(){}.getType(); // copied from https://stackoverflow.com/questions/5554217/google-gson-deserialize-listclass-object-generic-type
-        return gson.fromJson(jsonString, listMonitoredObjects);
+        List<MonitoredObject> objects = gson.fromJson(jsonString, listMonitoredObjects);
+        return objects;
     }
 
     private String JSONReader(Context con){
-        InputStream resourceReader = con.getResources().openRawResource(R.raw.fakes);
+        InputStream resourceReader = con.getResources().openRawResource(R.raw.fakes1);
         Writer writer = new StringWriter();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(resourceReader, "UTF-8"));

@@ -3,6 +3,7 @@ package com.apps.frederik.treetracker.Model.MonitoredObject;
 
 import java.util.List;
 
+import com.apps.frederik.treetracker.Model.Metadata.Metadata;
 import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
 import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.gson.annotations.Expose;
@@ -20,6 +21,9 @@ public class MonitoredObject {
     @SerializedName("Description")
     @Expose
     private String description;
+    @SerializedName("Metadata")
+    @Expose
+    private Metadata meta;
     @SerializedName("MonitoredProperties")
     @Expose
     private List<MonitoredProperty> monitoredProperties = null;
@@ -41,6 +45,14 @@ public class MonitoredObject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Metadata getMeta() {
+        return meta;
+    }
+
+    public void setMeta(Metadata meta) {
+        this.meta = meta;
     }
 
     public List<MonitoredProperty> getMonitoredProperties() {

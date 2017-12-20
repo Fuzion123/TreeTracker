@@ -2,7 +2,6 @@ package com.apps.frederik.treetracker.Fragments;
 
 import android.support.v4.app.Fragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

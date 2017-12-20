@@ -213,9 +213,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                     .show(getSupportFragmentManager().findFragmentByTag(fragmentTag))
                     .commit();
         } else {
-            Fragment fragment;
+            MonitoredObjectFragment fragment;
             try{
-                fragment = (Fragment) fragmentClass.newInstance();
+                fragment = (MonitoredObjectFragment) fragmentClass.newInstance();
+                fragment.SetMonitoredObjects(_binder.GetAllMonitoredObjects());
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, fragment, fragmentTag)
                         .addToBackStack(fragmentTag)
@@ -228,6 +229,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onListFragmentInteraction(MonitoredObject item) {
-        Toast.makeText(this, "Monitored UUID: " + item.getUUID(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Monitored metadata: " + item.getMeta().getType(), Toast.LENGTH_SHORT).show();
     }
 }
