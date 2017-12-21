@@ -11,8 +11,20 @@
     "Identifier" : "Humidity",
     "Readings" : [ {
       "Data" : 0.4,
-      "TimeStamp" : 12202017013125
-    } ]
+      "TimeStamp" : 1
+    }, {
+      "Data": 0.5,
+      "TimeStamp": 2
+    }, {
+      "Data": 0.7,
+      "TimeStamp": 3
+    }, {
+      "Data": 0.3,
+      "TimeStamp": 4
+    }, {
+      "Data": 0.1,
+      "TimeStamp": 5
+    }]
   } ],
   "UUID" : "very_secret_UUID"
 }, {
@@ -27,9 +39,21 @@
   "MonitoredProperties" : [ {
     "Identifier" : "Humidity",
     "Readings" : [ {
-      "Data" : 0.7,
-      "TimeStamp" : 12202017013125
-    } ]
+      "Data" : 0.4,
+      "TimeStamp" : 1
+    }, {
+      "Data": 0.5,
+      "TimeStamp": 2
+    }, {
+      "Data": 0.7,
+      "TimeStamp": 3
+    }, {
+      "Data": 0.3,
+      "TimeStamp": 4
+    }, {
+      "Data": 0.1,
+      "TimeStamp": 5
+    }]
   } ],
   "UUID" : "very_very_secret"
 } ]

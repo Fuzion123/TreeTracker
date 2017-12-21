@@ -9,5 +9,5 @@ import java.util.List;
  */
 
 public interface IActivityToFragmentCommunication {
-    void SetData(List<MonitoredObject> objects);
+    void SetData(Object objects);
 }

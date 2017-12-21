@@ -10,5 +10,5 @@ import java.util.List;
 
 public class MonitoredObjectFragment extends Fragment implements IActivityToFragmentCommunication {
     @Override
-    public void SetData(List<MonitoredObject> objects) {}
+    public void SetData(Object objects) {}
 }

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.apps.frederik.treetracker.Fragments.GraphFragment;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 
@@ -20,6 +21,7 @@ public class DetailActivity extends AppCompatActivity {
     private boolean _isBoundToService;
     private MonitoredObject _object;
     private String UUID = null;
+    private GraphFragment graphFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,10 @@ public class DetailActivity extends AppCompatActivity {
     private void Initialize(){
         _object = _binder.GetMonitoredObjectFor(UUID);
         Toast.makeText(this, "UUID: " + UUID, Toast.LENGTH_LONG).show();
+
+        graphFragment = new GraphFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_detail, graphFragment).commit();
+        graphFragment.SetData(_object.getMonitoredProperties().get(0));
     }
 
     private ServiceConnection _connection = new ServiceConnection() {

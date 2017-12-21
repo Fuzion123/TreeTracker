@@ -68,8 +68,8 @@ public class MapFragment extends MonitoredObjectFragment {
         return rootView;
     }
 
-    public void SetData(List<MonitoredObject> objects) {
-        _objects = objects;
+    public void SetData(Object objects) {
+        _objects = (List<MonitoredObject>)objects;
         for (MonitoredObject obj:_objects) {
             AddMarker(obj);
         }

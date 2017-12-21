@@ -1,5 +1,3 @@
-
-<!-- TODO Consider yousing a ReletiveLayout or ConstraintLayout instead?? maybe its better-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

@@ -98,12 +98,12 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
     }
 
     @Override
-    public void SetData(List<MonitoredObject> objects) {
-        _objects = objects;
+    public void SetData(Object objects) {
+        _objects = (List<MonitoredObject>)objects;
 
         if(_recyclerView == null) return; // onCreateView has not been called yet, so the recyclerView is null
 
-        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).UpdateList(objects);
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).UpdateList(_objects);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
 
