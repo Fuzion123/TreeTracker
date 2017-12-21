@@ -24,9 +24,11 @@ import android.view.MenuItem;
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.apps.frederik.treetracker.Globals.UUID_DETAILED_MONITORED_OBJECT;
@@ -78,6 +80,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         else {
             navigationView.setCheckedItem(R.id.nav_listFragment);
         }
+
+        List<MonitoredObject> o = new FakeRepository(this).GenerateFakeModel();
 
         InstantiateFragmentByTag(_currentFragmentTag);
 

@@ -11,19 +11,19 @@
     "Identifier" : "Humidity",
     "Readings" : [ {
       "Data" : 0.4,
-      "TimeStamp" : 1
+      "TimeStamp" : "Mon Dec 18 15:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.5,
-      "TimeStamp": 2
+      "TimeStamp": "Mon Dec 18 17:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.7,
-      "TimeStamp": 3
+      "TimeStamp": "Tue Dec 19 08:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.3,
-      "TimeStamp": 4
+      "TimeStamp": "Tue Dec 19 12:37:38 GMT+01:00 2017"
     }, {
       "Data": 0.1,
-      "TimeStamp": 5
+      "TimeStamp": "Wed Dec 20 11:37:38 GMT+01:00 2017"
     }]
   } ],
   "UUID" : "very_secret_UUID"
@@ -40,19 +40,19 @@
     "Identifier" : "Humidity",
     "Readings" : [ {
       "Data" : 0.4,
-      "TimeStamp" : 1
+      "TimeStamp" : "Mon Dec 18 15:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.5,
-      "TimeStamp": 2
+      "TimeStamp": "Mon Dec 18 17:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.7,
-      "TimeStamp": 3
+      "TimeStamp": "Tue Dec 19 08:33:11 GMT+01:00 2017"
     }, {
       "Data": 0.3,
-      "TimeStamp": 4
+      "TimeStamp": "Tue Dec 19 12:37:38 GMT+01:00 2017"
     }, {
       "Data": 0.1,
-      "TimeStamp": 5
+      "TimeStamp": "Wed Dec 20 11:37:38 GMT+01:00 2017"
     }]
   } ],
   "UUID" : "very_very_secret"

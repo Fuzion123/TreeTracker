@@ -37,7 +37,6 @@ public class DetailActivity extends AppCompatActivity {
 
     private void Initialize(){
         _object = _binder.GetMonitoredObjectFor(UUID);
-        Toast.makeText(this, "UUID: " + UUID, Toast.LENGTH_LONG).show();
 
         graphFragment = new GraphFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_detail, graphFragment).commit();

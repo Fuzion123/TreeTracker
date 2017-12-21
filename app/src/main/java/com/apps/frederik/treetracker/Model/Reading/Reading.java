@@ -14,7 +14,7 @@ public class Reading {
     private Double data;
     @SerializedName("TimeStamp")
     @Expose
-    private Long timeStamp;
+    private String timeStamp;
 
     public Double getData() {
         return data;
@@ -24,11 +24,11 @@ public class Reading {
         this.data = data;
     }
 
-    public Long getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Long timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 }

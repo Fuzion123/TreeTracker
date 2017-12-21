@@ -9,7 +9,8 @@ import java.util.Date;
  */
 
 public final class TimestampFakeGenerator {
-    public static TimeStamp GenerateTimeStamp() throws ParseException {
+    /*
+    public static TimeStampHelper GenerateTimeStamp() throws ParseException {
         //Date dateLowerRange = new Date();
         //Date dateUpperRange = new Date();
 
@@ -18,6 +19,7 @@ public final class TimestampFakeGenerator {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy/hh:mm:ss");
         Date parsedDate = formatter.parse(dateInString);
 
-        return new TimeStamp(parsedDate);
+        return new TimeStampHelper(parsedDate);
     }
+    */
 }

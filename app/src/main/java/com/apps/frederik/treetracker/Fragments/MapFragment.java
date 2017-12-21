@@ -1,13 +1,15 @@
 package com.apps.frederik.treetracker.Fragments;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.apps.frederik.treetracker.DetailActivity;
+import com.apps.frederik.treetracker.Globals;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.android.gms.maps.CameraUpdate;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 import com.apps.frederik.treetracker.R;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -34,9 +37,10 @@ public class MapFragment extends MonitoredObjectFragment {
     private GoogleMap _googleMap = null;
     private List<MonitoredObject> _objects = new ArrayList<>();
     private List<Marker> _markers = new ArrayList<>();
+    private CameraPosition _camPosition;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -61,7 +65,24 @@ public class MapFragment extends MonitoredObjectFragment {
                 for(MonitoredObject obj : _objects){
                     AddMarker(obj);
                 }
+
                 SetMapZoom();
+
+                _googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        int cnt = _markers.size();
+                        for (int i = 0; i< cnt; i++)
+                        {
+                            if(_markers.get(i).equals(marker)){
+                                String uuid = _objects.get(i).getUUID();
+                                Intent detail = new Intent(getContext(), DetailActivity.class);
+                                detail.putExtra(Globals.UUID_DETAILED_MONITORED_OBJECT, uuid);
+                                startActivity(detail);
+                            }
+                        }
+                    }
+                });
             }
         });
 
@@ -80,14 +101,20 @@ public class MapFragment extends MonitoredObjectFragment {
         if(_googleMap != null){
             Coordinate c = obj.getCoordinate();
             LatLng latLng = new LatLng(c.getLatitude(), c.getLongitude());
-            _markers.add(_googleMap.addMarker(new MarkerOptions()
+            Marker m = _googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
                     .anchor(0.5f,0.5f)
-                    .title(obj.getDescription())
+                    .title(obj.getDescription() + "\ngo to details")
                     .draggable(false)
-                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMeta().getType())))));
+                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMeta().getType()))));
+
+            _markers.add(m);
+
+
         }
     }
+
+
 
     private Bitmap findMarkerImage(String type){
         // to make image smaller
@@ -111,34 +138,42 @@ public class MapFragment extends MonitoredObjectFragment {
 
     // inspired by: https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers
     private void SetMapZoom(){
-        if(_googleMap!= null){
-            int cnt =_markers.size();
-            if(cnt == 0){
-                return; // no zoom
-            }
+        if(_googleMap == null) return;
 
-            // camera object that specifies where to "look" on map
-            CameraUpdate cameraUpdate;
-
-            // only 1 marker on map have no area, so cant create bounds : sets a fixed zoom to that specific marker pos.
-            if(cnt == 1){
-                cameraUpdate = CameraUpdateFactory.newLatLngZoom(_markers.get(0).getPosition(), 12F);
-            }
-            // multiple markers can create an area of where to zoomn
-            else{
-                LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-
-                for (Marker m: _markers) {
-                    boundsBuilder.include(m.getPosition());
-                }
-                LatLngBounds bounds = boundsBuilder.build();
-
-                int padding = 200; // additional padding  to not be zoomed all the way into the boundary area
-                cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            }
-            _googleMap.moveCamera(cameraUpdate);
+        if(_camPosition != null){
+            _googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(_camPosition));
+            return;
         }
+
+        int cnt =_markers.size();
+        if(cnt == 0){
+            return; // no zoom
+        }
+
+        // camera object that specifies where to "look" on map
+        CameraUpdate cameraUpdate;
+
+        // only 1 marker on map have no area, so cant create bounds : sets a fixed zoom to that specific marker pos.
+        if(cnt == 1){
+            cameraUpdate = CameraUpdateFactory.newLatLngZoom(_markers.get(0).getPosition(), 12F);
+        }
+        // multiple markers can create an area of where to zoomn
+        else{
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+            for (Marker m: _markers) {
+                boundsBuilder.include(m.getPosition());
+            }
+            LatLngBounds bounds = boundsBuilder.build();
+
+            int padding = 200; // additional padding  to not be zoomed all the way into the boundary area
+            cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        }
+        _googleMap.moveCamera(cameraUpdate);
+
     }
+
+
 
     @Override
     public void onResume() {
@@ -164,5 +199,10 @@ public class MapFragment extends MonitoredObjectFragment {
         _mapView.onLowMemory();
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(_googleMap == null) return;
+        _camPosition = _googleMap.getCameraPosition();
+    }
 }

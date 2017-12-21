@@ -1,19 +1,5 @@
 package com.apps.frederik.treetracker.Model.DataAccessLayer;
 
-import android.util.Log;
-
-import com.apps.frederik.treetracker.Model.Util.Coordinate;
-import com.apps.frederik.treetracker.Model.Util.GpsFakeGenerator;
-import com.apps.frederik.treetracker.Model.Util.TimeStamp;
-import com.apps.frederik.treetracker.Model.Util.TimestampFakeGenerator;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import static java.util.UUID.randomUUID;
-
 /**
  * Created by Frederik on 12/10/2017.
  */
@@ -95,7 +81,7 @@ final public class FakeDatabaseRepository {
     // fake reading generator
     private static HumidityReading GenerateFakeData() throws ParseException {
         int readingValue = _random.nextInt(100);
-        TimeStamp timeStamp = TimestampFakeGenerator.GenerateTimeStamp();
+        TimeStampHelper timeStamp = TimestampFakeGenerator.GenerateTimeStamp();
 
         return new HumidityReading(readingValue, timeStamp);
     }
