@@ -1,0 +1,35 @@
+[ {
+  "Coordinate" : {
+    "Latitude" : 56.172613,
+    "Longitude" : 10.190612
+  },
+  "Description" : "good old lemon tree",
+  "Metadata" : {
+    "Type" : "tree"
+  },
+  "MonitoredProperties" : [ {
+    "Identifier" : "Humidity",
+    "Readings" : [ {
+      "Data" : 0.4,
+      "TimeStamp" : 12202017013125
+    } ]
+  } ],
+  "UUID" : "very_secret_UUID"
+}, {
+  "Coordinate" : {
+    "Latitude" : 56.176905,
+    "Longitude" : 10.147523
+  },
+  "Description" : "Christmas tree",
+  "Metadata" : {
+    "Type" : "tree"
+  },
+  "MonitoredProperties" : [ {
+    "Identifier" : "Humidity",
+    "Readings" : [ {
+      "Data" : 0.7,
+      "TimeStamp" : 12202017013125
+    } ]
+  } ],
+  "UUID" : "very_very_secret"
+} ]

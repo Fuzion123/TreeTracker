@@ -1,5 +1,7 @@
 package com.apps.frederik.treetracker.Fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 import com.apps.frederik.treetracker.R;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -40,8 +43,10 @@ public class MapFragment extends MonitoredObjectFragment {
         _mapView = (MapView) rootView.findViewById(R.id.mapView);
 
         _mapView.onCreate(savedInstanceState);
-
         _mapView.onResume();
+
+        setRetainInstance(true); // saves complex objects on orientation rotation
+
 
         try{
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -63,7 +68,7 @@ public class MapFragment extends MonitoredObjectFragment {
         return rootView;
     }
 
-    public void SetMonitoredObjects(List<MonitoredObject> objects) {
+    public void SetData(List<MonitoredObject> objects) {
         _objects = objects;
         for (MonitoredObject obj:_objects) {
             AddMarker(obj);
@@ -77,10 +82,33 @@ public class MapFragment extends MonitoredObjectFragment {
             LatLng latLng = new LatLng(c.getLatitude(), c.getLongitude());
             _markers.add(_googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
-                    .title(obj.getDescription())));
-
+                    .anchor(0.5f,0.5f)
+                    .title(obj.getDescription())
+                    .draggable(false)
+                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMeta().getType())))));
         }
     }
+
+    private Bitmap findMarkerImage(String type){
+        // to make image smaller
+        int height = 100;
+        int width = 80;
+        BitmapDrawable bitmapdraw;
+
+        // choose different marker images depending on the type.
+        switch (type){
+            case "tree":{
+                bitmapdraw = (BitmapDrawable)getResources().getDrawable(R.drawable.tree);
+                break;
+            }
+            default:{
+                bitmapdraw = (BitmapDrawable)getResources().getDrawable(R.drawable.marker_default);
+            }
+        }
+        Bitmap bitmap = bitmapdraw.getBitmap();
+        return Bitmap.createScaledBitmap(bitmap,width, height, false);
+    }
+
     // inspired by: https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers
     private void SetMapZoom(){
         if(_googleMap!= null){
@@ -135,4 +163,6 @@ public class MapFragment extends MonitoredObjectFragment {
         super.onLowMemory();
         _mapView.onLowMemory();
     }
+
+
 }

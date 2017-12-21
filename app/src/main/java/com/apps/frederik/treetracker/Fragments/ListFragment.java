@@ -30,6 +30,7 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView _recyclerView;
+    private List<MonitoredObject> _objects = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,6 +52,7 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -71,7 +73,8 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
             } else {
                 _recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            _recyclerView.setAdapter(new MyRecyclerViewAdapter(new ArrayList<MonitoredObject>(), mListener));
+            _recyclerView.setAdapter(new MyRecyclerViewAdapter(_objects, mListener));
+            _recyclerView.getAdapter().notifyDataSetChanged();
         }
         return view;
     }
@@ -95,7 +98,11 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
     }
 
     @Override
-    public void SetMonitoredObjects(List<MonitoredObject> objects) {
+    public void SetData(List<MonitoredObject> objects) {
+        _objects = objects;
+
+        if(_recyclerView == null) return; // onCreateView has not been called yet, so the recyclerView is null
+
         ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).UpdateList(objects);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
