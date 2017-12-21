@@ -20,18 +20,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-import com.apps.frederik.treetracker.SensorService.SensorServiceBinder;
+import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 
 import java.util.List;
 
+import static com.apps.frederik.treetracker.Globals.UUID_DETAILED_MONITORED_OBJECT;
+
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
-    private SensorServiceBinder _binder;
+    private MonitorServiceBinder _binder;
     private boolean _isBoundToService;
     private MonitoredObjectFragment _currentFragement;
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
@@ -80,7 +81,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         InstantiateFragmentByTag(_currentFragmentTag);
 
-        Intent intentService = new Intent(this, SensorService.class);
+        Intent intentService = new Intent(this, MonitorService.class);
         bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -129,7 +130,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            _binder = (SensorServiceBinder) binder;
+            _binder = (MonitorServiceBinder) binder;
             _isBoundToService = true;
 
             if(_currentFragement == null) return;
@@ -221,7 +222,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onListFragmentInteraction(MonitoredObject item) {
-        Toast.makeText(this, "Monitored metadata: " + item.getMeta().getType(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(UUID_DETAILED_MONITORED_OBJECT, item.getUUID());
+        startActivity(intent);
     }
 
     @Override

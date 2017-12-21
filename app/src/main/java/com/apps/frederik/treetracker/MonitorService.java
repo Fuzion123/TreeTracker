@@ -13,9 +13,9 @@ import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SensorService extends Service {//implements IModelEventListener {
+public class MonitorService extends Service {//implements IModelEventListener {
     private List<MonitoredObject> _objects = new ArrayList<>();
-    private IBinder _sensorBinder = new SensorServiceBinder();
+    private IBinder _sensorBinder = new MonitorServiceBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -58,7 +58,7 @@ public class SensorService extends Service {//implements IModelEventListener {
     */
 
 
-    public class SensorServiceBinder extends Binder {
+    public class MonitorServiceBinder extends Binder {
         MonitoredObject GetMonitoredObjectFor(String uuid)
         {
             return GetMoniToredObjectFor(uuid);
