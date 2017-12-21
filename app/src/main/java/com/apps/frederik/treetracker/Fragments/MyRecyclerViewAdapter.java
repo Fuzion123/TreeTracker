@@ -30,6 +30,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(final MonitoredObjectViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mDiscriptionView.setText(mValues.get(position).getDescription());
+        String lastReading = mValues.get(position).getMonitoredProperties().get(0).getReadings().get(0).getData().toString();
+        holder.mLastReadingView.setText(lastReading);
+        holder.mId.setText(mValues.get(position).getUUID());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,12 +58,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public class MonitoredObjectViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mDiscriptionView;
+        public final TextView mLastReadingView;
+        public final TextView mId;
         public MonitoredObject mItem;
 
         public MonitoredObjectViewHolder(View view) {
             super(view);
             mView = view;
-            mDiscriptionView = (TextView) view.findViewById(R.id.content);
+            mDiscriptionView = view.findViewById(R.id.content);
+            mLastReadingView = view.findViewById(R.id.lastReading);
+            mId = view.findViewById(R.id.id);
         }
 
         @Override

@@ -32,5 +32,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_historical_data">Historical data</string>
+    <string name="Y_axis_title_humidity">Humidity (%)</string>
+    <string name="text_treetracker">TreeTracker</string>
+    <string name="text_sensor_content">content</string>
+    <string name="text_sensor_id">id</string>
+    <string name="text_sensor_lastReading">lastReading</string>
+    <string name="percentage">%</string>
 
 </resources>
