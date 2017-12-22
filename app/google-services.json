@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1036336589676",
+    "firebase_url": "https://treetracker-b2d27.firebaseio.com",
+    "project_id": "treetracker-b2d27",
+    "storage_bucket": "treetracker-b2d27.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036336589676:android:3dba0607b135b22b",
+        "android_client_info": {
+          "package_name": "com.apps.frederik.treetracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1036336589676-6kl1ktmg0h1lr8n0gutq4mifg4djf282.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.apps.frederik.treetracker",
+            "certificate_hash": "5445900a45284d27a9b20a91ad4235c1ee2af43a"
+          }
+        },
+        {
+          "client_id": "1036336589676-v87kf3spc5am0oslhbta49hvldoes4d5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDueynt2EvWboYDX40DuGyYJbIN8doGETc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1036336589676-v87kf3spc5am0oslhbta49hvldoes4d5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

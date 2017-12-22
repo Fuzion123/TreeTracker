@@ -30,6 +30,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public void onBindViewHolder(final MonitoredObjectViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mDiscriptionView.setText(mValues.get(position).getDescription());
+        //TODO This is not the latest reading, that is being shown in the view.
         String lastReading = mValues.get(position).getMonitoredProperties().get(0).getReadings().get(0).getData().toString();
         holder.mLastReadingView.setText(lastReading);
         holder.mId.setText(mValues.get(position).getUUID());
