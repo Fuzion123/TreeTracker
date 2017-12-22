@@ -81,6 +81,7 @@ public class MonitoredProperty {
 
                 Readings.add(newReading); // new reading added
                 Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
+                broadcast.putExtra(Globals.IDENTIFER, MonitoredProperty.this.getIdentifier());
                 LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
             }
 

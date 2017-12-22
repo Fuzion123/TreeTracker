@@ -12,6 +12,7 @@ public final class Globals {
     public static final String LOCAL_BROADCAST_NEW_MON_PROPERTY = "com.apps.frederik.treetracker.local.broadcast.new.mon.property";
     public static final String LOCAL_BROADCAST_MON_PROPERTY_REMOVED = "com.apps.frederik.treetracker.local.broadcast.mon.property.removed";
     public static final String UUID = "com.apps.frederik.treetracker.uuid";
+    public static final String IDENTIFER = "com.apps.frederik.treetracker.identifer";
     public static final String APP_NAME = "TreeTracker";
     public static final String DATABASE_REFERENCE = "com.apps.frederik.treetracker.database.reference";
 }

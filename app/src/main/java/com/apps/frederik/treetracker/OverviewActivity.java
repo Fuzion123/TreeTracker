@@ -27,6 +27,11 @@ import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.DataAccessLayer.DatabaseRepository;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static com.apps.frederik.treetracker.Globals.UUID;
 
@@ -50,7 +55,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OverviewActivity.this, AddSensorActivity.class);
+                Intent intent = new Intent(OverviewActivity.this, AddMonitoredObjectActivity.class);
                 startActivity(intent);
             }
         });
@@ -79,12 +84,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         }
 
         InstantiateFragmentByTag(_currentFragmentTag);
-
-
-        DatabaseRepository db = new DatabaseRepository("Test");
-        db.SetValue("hey");
-
-
 
         Intent intentService = new Intent(this, MonitorService.class);
         // TODO add authentication. Should be userId instead of hardcoded user: "Fuzion"

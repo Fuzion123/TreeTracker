@@ -101,7 +101,7 @@ public class ListFragment extends MonitoredObjectFragment implements IMonitoredO
 
         if(_recyclerView == null) return;
 
-        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddData(obj);
+        //((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddData(obj);
         _recyclerView.getAdapter().notifyDataSetChanged();
 
     }
@@ -112,7 +112,7 @@ public class ListFragment extends MonitoredObjectFragment implements IMonitoredO
 
         if(_recyclerView == null) return;
 
-        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddAllData(objs);
+        //((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddAllData(objs);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
 

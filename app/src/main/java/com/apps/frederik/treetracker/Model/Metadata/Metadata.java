@@ -7,6 +7,14 @@ package com.apps.frederik.treetracker.Model.Metadata;
 public class Metadata {
     private String Type;
 
+    public Metadata(){
+
+    }
+
+    public Metadata(String type){
+        Type = type;
+    }
+
     public String getType() {
         return Type;
     }

@@ -18,6 +18,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -32,7 +33,9 @@ public class MonitoredObject {
     private Metadata Metadata;
     private List<MonitoredProperty> MonitoredProperties = new ArrayList<>();
     private String UUID;
+    @Exclude
     private DatabaseReference _dBRef;
+    @Exclude
     private Context _context;
 
     public Coordinate getCoordinate() {
@@ -75,6 +78,7 @@ public class MonitoredObject {
         this.UUID = uUID;
     }
 
+    @Exclude
     public void SetupDatabaseListeners(DatabaseReference ref, Context con){
         _dBRef = ref;
         _context = con;

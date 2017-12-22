@@ -31,10 +31,10 @@ import java.util.List;
 public class GraphFragment extends Fragment implements IPropertyDataUpdater {
     private MonitoredProperty _property;
     private GraphView _graph;
-    PointsGraphSeries<DataPoint> seriesPoint = new PointsGraphSeries<DataPoint>();
-    LineGraphSeries<DataPoint> seriesLine = new LineGraphSeries<DataPoint>();
+    private PointsGraphSeries<DataPoint> seriesPoint = new PointsGraphSeries<DataPoint>();
+    private LineGraphSeries<DataPoint> seriesLine = new LineGraphSeries<DataPoint>();
     private Date minTimeXAxis;
-    Date maxTimeXAxis;
+    private Date maxTimeXAxis;
     private View _view;
 
 
@@ -63,12 +63,18 @@ public class GraphFragment extends Fragment implements IPropertyDataUpdater {
     @Override
     public void AddReading(Reading read) {
         _property.getReadings().add(read);
-
         PopulateGraph();
     }
 
     private void PopulateGraph(){
         final List<DataPoint> data = new ArrayList<>();
+
+        int cnt = _property.getReadings().size();
+
+        if(cnt == 0){
+
+            return;
+        }
 
         for (Reading r : _property.getReadings()){
             data.add(new DataPoint(TimeStampHelper.get_dataTime(r.getTimeStamp()), r.getData()));
@@ -98,6 +104,8 @@ public class GraphFragment extends Fragment implements IPropertyDataUpdater {
         });
 
         seriesLine = new LineGraphSeries<DataPoint>(dataArray);
+
+        _graph.removeAllSeries();
         _graph.addSeries(seriesPoint);
         _graph.addSeries(seriesLine);
     }

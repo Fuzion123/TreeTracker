@@ -2,13 +2,16 @@ package com.apps.frederik.treetracker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,16 +25,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apps.frederik.treetracker.Model.Metadata.Metadata;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObjectToFirebase;
+import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
 import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-public class AddSensorActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public class AddMonitoredObjectActivity extends AppCompatActivity {
+
+    private MonitorService.MonitorServiceBinder _binder;
+    private boolean _isBoundToService;
+
 
     private static final int RC_BARCODE_CAPTURE = 1234;
     private static final int RC_HANDLE_LOCATION_PERM = 4321;
-    private static final String TAG = "AddSensorActivity";
+    private static final String TAG = "AddMonitoredObjectActivity";
 
     private Button buttonAddSensor;
     private EditText editTextSensorName;
@@ -93,7 +110,7 @@ public class AddSensorActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AddSensorActivity.this, BarcodeCaptureActivity.class);
+                Intent intent = new Intent(AddMonitoredObjectActivity.this, BarcodeCaptureActivity.class);
                 startActivityForResult(intent, RC_BARCODE_CAPTURE);
             }
         });
@@ -107,7 +124,7 @@ public class AddSensorActivity extends AppCompatActivity {
                 //TODO: Add a proper (null?) check
                 if (invalidSensorName())
                 {
-                    Toast.makeText(AddSensorActivity.this, "Enter a name, please", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddMonitoredObjectActivity.this, "Enter a name, please", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -117,6 +134,32 @@ public class AddSensorActivity extends AppCompatActivity {
                     requestLocationPermission();
             }
         });
+
+        Intent service = new Intent(this, MonitorService.class);
+        bindService(service,_connection, Context.BIND_AUTO_CREATE);
+    }
+
+    private ServiceConnection _connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            _binder = (MonitorService.MonitorServiceBinder) binder;
+            _isBoundToService = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            _isBoundToService = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        if(_isBoundToService){
+            unbindService(_connection);
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -167,12 +210,33 @@ public class AddSensorActivity extends AppCompatActivity {
             }
         }
         */
+
+        if(!_isBoundToService) throw new RuntimeException("AddMonitoredObjectActivity: is not bound to service where it should be!");
+
+        if(!_binder.SensorPackageWithUuidExists(uuid)){
+            Toast.makeText(this, "No tracker was found with that UUID. No Tracker was added!", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
+
+        MonitoredObject obj = new MonitoredObject();
+        obj.setCoordinate(gpsCoordinate);
+        obj.setMetadata(new Metadata("tree")); // TODO now, type is only hardcoded to type = tree!
+        obj.setDescription(editTextSensorName.getText().toString());
+        obj.setUUID(uuid);
+        obj.setMonitorGedProperties(new ArrayList<MonitoredProperty>());
+
+
+        _binder.AddMonitoredObject(obj);
+
         finish();
+        return;
     }
 
     private boolean checkLocationPermission() {
         //Check if location permission is granted
-        int rc = ActivityCompat.checkSelfPermission(AddSensorActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int rc = ActivityCompat.checkSelfPermission(AddMonitoredObjectActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
         // Register the listener with the Location Manager to receive location updates
         if (rc == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -200,9 +264,9 @@ public class AddSensorActivity extends AppCompatActivity {
     };
 
     private void requestLocationPermission() {
-        Log.w(TAG, "Location permission is not granted. Requesting permission");
+        Log.w("ADDNewObject", "Location permission is not granted. Requesting permission");
 
-        final Activity thisActivity = AddSensorActivity.this;
+        final Activity thisActivity = AddMonitoredObjectActivity.this;
         final String[] permissions = new String[]
                 {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
@@ -216,7 +280,7 @@ public class AddSensorActivity extends AppCompatActivity {
             if (checkLocationPermission())
                 return;
             else {
-                Log.e(TAG, "Permissions not granted." +
+                Log.e("ADDNewObject", "Permissions not granted." +
                         " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
             }
         }
@@ -246,9 +310,9 @@ public class AddSensorActivity extends AppCompatActivity {
                     textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
                     textViewUUIDValue.setText(barcode.displayValue);
                     uuid = barcode.displayValue;
-                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
+                    Log.d("ADDNewObject", "Barcode read: " + barcode.displayValue);
                 } else {
-                    Log.d(TAG, "No barcode captured, intent data is null");
+                    Log.d("ADDNewObject", "No barcode captured, intent data is null");
                 }
             }
         }

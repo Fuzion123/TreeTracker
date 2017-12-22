@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddSensorActivity"
+            android:name=".AddMonitoredObjectActivity"
             android:label="@string/title_activity_add_sensor"
             android:theme="@style/AppTheme.NoActionBar" />
 

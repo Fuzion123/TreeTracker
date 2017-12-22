@@ -11,8 +11,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
+import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 
@@ -37,6 +39,13 @@ public class DetailActivity extends AppCompatActivity {
 
     private void Initialize(){
         _object = _binder.GetMonitoredObjectFor(UUID);
+
+        if(_object.getMonitoredProperties().size() == 0)
+        {
+            Toast.makeText(this, "No readings is yet available!", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         graphFragment = new GraphFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_detail, graphFragment).commit();
@@ -80,7 +89,10 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(_isBoundToService){
-                //graphFragment.AddReading();
+                String identifier = intent.getExtras().getString(Globals.IDENTIFER);
+                MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UUID, identifier);
+                int lastVal = prop.getReadings().size();
+                graphFragment.AddReading(prop.getReadings().get(lastVal-1));
             }
             else{
                 throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
