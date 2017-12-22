@@ -2,7 +2,6 @@ package com.apps.frederik.treetracker.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.R;
 
@@ -23,7 +21,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ListFragment extends MonitoredObjectFragment implements IActivityToFragmentCommunication {
+public class ListFragment extends MonitoredObjectFragment implements IMonitoredObjectDataUpdater {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -98,12 +96,23 @@ public class ListFragment extends MonitoredObjectFragment implements IActivityTo
     }
 
     @Override
-    public void SetData(Object objects) {
-        _objects = (List<MonitoredObject>)objects;
+    public void AddMonitoredObject(MonitoredObject obj) {
+        _objects.add(obj);
 
-        if(_recyclerView == null) return; // onCreateView has not been called yet, so the recyclerView is null
+        if(_recyclerView == null) return;
 
-        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).UpdateList(_objects);
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddData(obj);
+        _recyclerView.getAdapter().notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void SetAllData(List<MonitoredObject> objs) {
+        _objects = objs;
+
+        if(_recyclerView == null) return;
+
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddAllData(objs);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
 

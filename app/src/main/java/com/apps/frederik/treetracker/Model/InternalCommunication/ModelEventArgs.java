@@ -1,29 +1,17 @@
 package com.apps.frederik.treetracker.Model.InternalCommunication;
 
 
+import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+
 /**
  * Created by Frederik on 12/10/2017.
  */
 
-/*
+
 public class ModelEventArgs {
-    public final IMonitoredProperty Sensor;
-    public final IReading Reading;
+    public final MonitoredObject _obj;
 
-    public ModelEventArgs(IMonitoredProperty sensor, IReading reading){
-        this.Sensor = sensor;
-        this.Reading = reading;
+    public ModelEventArgs(MonitoredObject obj){
+        _obj = obj;
     }
-
-    public ModelEventArgs(IMonitoredProperty sensor){
-        this.Sensor = sensor;
-        this.Reading = null;
-    }
-
-    public ModelEventArgs(IReading reading){
-        this.Sensor = null;
-        this.Reading = reading;
-    }
-
 }
-*/

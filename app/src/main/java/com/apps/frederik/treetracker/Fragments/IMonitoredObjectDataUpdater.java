@@ -8,6 +8,7 @@ import java.util.List;
  * Created by frede on 20/12/2017.
  */
 
-public interface IActivityToFragmentCommunication {
-    void SetData(Object objects);
+public interface IMonitoredObjectDataUpdater {
+    void AddMonitoredObject(MonitoredObject obj);
+    void SetAllData(List<MonitoredObject> objs);
 }

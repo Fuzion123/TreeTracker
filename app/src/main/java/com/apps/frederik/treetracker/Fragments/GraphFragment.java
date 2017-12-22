@@ -28,7 +28,7 @@ import java.util.List;
 
 // using Graph View from: https://github.com/appsthatmatter/GraphView
 // All usage is inspired by guides from: http://www.android-graphview.org/
-public class GraphFragment extends Fragment implements IActivityToFragmentCommunication {
+public class GraphFragment extends Fragment implements IPropertyDataUpdater {
     private MonitoredProperty _property;
     private GraphView _graph;
     PointsGraphSeries<DataPoint> seriesPoint = new PointsGraphSeries<DataPoint>();
@@ -51,14 +51,19 @@ public class GraphFragment extends Fragment implements IActivityToFragmentCommun
         return _view;
     }
 
-
     @Override
-    public void SetData(Object object) {
-        _property = (MonitoredProperty) object;
+    public void SetMonitoredProperty(MonitoredProperty prop) {
+        _property = prop;
 
         if(_graph == null) return;
 
-        SetupGraphLayout();
+        PopulateGraph();
+    }
+
+    @Override
+    public void AddReading(Reading read) {
+        _property.getReadings().add(read);
+
         PopulateGraph();
     }
 
@@ -113,4 +118,6 @@ public class GraphFragment extends Fragment implements IActivityToFragmentCommun
         _graph.getViewport().setMinX(minTimeXAxis.getTime());
         _graph.getViewport().setMaxX(maxTimeXAxis.getTime());
     }
+
+
 }

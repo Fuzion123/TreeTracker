@@ -1,20 +1,20 @@
 package com.apps.frederik.treetracker;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.PersistableBundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-
-import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
     private MonitorServiceBinder _binder;
@@ -29,7 +29,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         setTitle(Globals.APP_NAME);
 
-        UUID = getIntent().getExtras().getString(Globals.UUID_DETAILED_MONITORED_OBJECT);
+        UUID = getIntent().getExtras().getString(Globals.UUID);
 
         Intent service = new Intent(this, MonitorService.class);
         bindService(service,_connection, Context.BIND_AUTO_CREATE);
@@ -40,7 +40,7 @@ public class DetailActivity extends AppCompatActivity {
 
         graphFragment = new GraphFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_detail, graphFragment).commit();
-        graphFragment.SetData(_object.getMonitoredProperties().get(0));
+        graphFragment.SetMonitoredProperty(_object.getMonitoredProperties().get(0));
     }
 
     private ServiceConnection _connection = new ServiceConnection() {
@@ -56,6 +56,42 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             _isBoundToService = false;
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        Log.d("OverviewActivity", "onResume");
+        LocalBroadcastManager.getInstance(this).registerReceiver(onNewReadingAdded, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onReaddingRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_READING_REMOVED));
+
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onNewReadingAdded);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReaddingRemoved);
+        super.onPause();
+    }
+
+
+    private BroadcastReceiver onNewReadingAdded = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(_isBoundToService){
+                //graphFragment.AddReading();
+            }
+            else{
+                throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+            }
+        }
+    };
+
+    private BroadcastReceiver onReaddingRemoved = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("OverviewActivity", "New Reading Added");
         }
     };
 

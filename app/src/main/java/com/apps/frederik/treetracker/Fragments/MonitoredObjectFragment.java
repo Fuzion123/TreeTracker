@@ -8,7 +8,15 @@ import java.util.List;
  * Created by frede on 20/12/2017.
  */
 
-public class MonitoredObjectFragment extends Fragment implements IActivityToFragmentCommunication {
+// This base class is used solely for the overview Activity to treat both the ListFragment and the MapFragment equally.
+public class MonitoredObjectFragment extends Fragment implements IMonitoredObjectDataUpdater {
     @Override
-    public void SetData(Object objects) {}
+    public void AddMonitoredObject(MonitoredObject obj) {
+
+    }
+
+    @Override
+    public void SetAllData(List<MonitoredObject> objs) {
+
+    }
 }

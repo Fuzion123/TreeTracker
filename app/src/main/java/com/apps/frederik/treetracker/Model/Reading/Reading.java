@@ -1,34 +1,35 @@
 package com.apps.frederik.treetracker.Model.Reading;
 
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by Frederik on 12/20/2017.
  */
 
 public class Reading {
-    @SerializedName("Data")
-    @Expose
-    private Double data;
-    @SerializedName("TimeStamp")
-    @Expose
-    private String timeStamp;
+    private Double Data;
+    private String TimeStamp;
 
     public Double getData() {
-        return data;
+        return Data;
     }
 
     public void setData(Double data) {
-        this.data = data;
+        this.Data = data;
     }
 
     public String getTimeStamp() {
-        return timeStamp;
+        return TimeStamp;
     }
 
     public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
+        this.TimeStamp = timeStamp;
+    }
+
+    public boolean equals(Object r){
+        if(r instanceof Reading){
+            Reading reading = (Reading) r;
+            if(reading.getTimeStamp().equals(this.getTimeStamp()) && reading.Data.equals(this.Data)) return true;
+        }
+        return false;
     }
 }

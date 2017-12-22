@@ -1,40 +1,37 @@
 package com.apps.frederik.treetracker.Model.Util;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by Frederik on 12/9/2017.
  */
 
 public class Coordinate {
 
-    @SerializedName("Latitude")
-    @Expose
-    private Double latitude;
-    @SerializedName("Longitude")
-    @Expose
-    private Double longitude;
+    private Double Latitude;
+    private Double Longitude;
+
+    public Coordinate(){
+
+    }
 
     public Coordinate(double latitude, double longitude){
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.Latitude = latitude;
+        this.Longitude = longitude;
     }
 
     public Double getLatitude() {
-        return latitude;
+        return Latitude;
     }
 
     public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+        this.Latitude = latitude;
     }
 
     public Double getLongitude() {
-        return longitude;
+        return Longitude;
     }
 
     public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+        this.Longitude = longitude;
     }
 }
 

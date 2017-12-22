@@ -77,7 +77,7 @@ public class MapFragment extends MonitoredObjectFragment {
                             if(_markers.get(i).equals(marker)){
                                 String uuid = _objects.get(i).getUUID();
                                 Intent detail = new Intent(getContext(), DetailActivity.class);
-                                detail.putExtra(Globals.UUID_DETAILED_MONITORED_OBJECT, uuid);
+                                detail.putExtra(Globals.UUID, uuid);
                                 startActivity(detail);
                             }
                         }
@@ -89,8 +89,17 @@ public class MapFragment extends MonitoredObjectFragment {
         return rootView;
     }
 
-    public void SetData(Object objects) {
-        _objects = (List<MonitoredObject>)objects;
+    @Override
+    public void AddMonitoredObject(MonitoredObject obj) {
+        _objects.add(obj);
+
+        AddMarker(obj);
+        SetMapZoom();
+    }
+
+    @Override
+    public void SetAllData(List<MonitoredObject> objs) {
+        _objects = objs;
         for (MonitoredObject obj:_objects) {
             AddMarker(obj);
         }
@@ -106,7 +115,7 @@ public class MapFragment extends MonitoredObjectFragment {
                     .anchor(0.5f,0.5f)
                     .title(obj.getDescription() + "\ngo to details")
                     .draggable(false)
-                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMeta().getType()))));
+                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMetadata().getType()))));
 
             _markers.add(m);
 

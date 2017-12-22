@@ -39,7 +39,7 @@ public class FakeRepository {
     }
 
     private String JSONReader(Context con){
-        InputStream resourceReader = con.getResources().openRawResource(R.raw.fakes1);
+        InputStream resourceReader = con.getResources().openRawResource(R.raw.fakedata);
         Writer writer = new StringWriter();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(resourceReader, "UTF-8"));

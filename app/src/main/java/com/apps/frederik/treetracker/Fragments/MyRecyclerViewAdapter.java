@@ -46,8 +46,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         });
     }
 
-    public void UpdateList(List<MonitoredObject> objects){
-        mValues = objects;
+    public void AddData(MonitoredObject obj){
+        mValues.add(obj);
+    }
+
+    public void AddAllData(List<MonitoredObject> objs){
+        mValues = objs;
     }
 
     @Override

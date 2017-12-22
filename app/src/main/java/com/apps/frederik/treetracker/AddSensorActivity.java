@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeDatabaseRepository;
 import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;

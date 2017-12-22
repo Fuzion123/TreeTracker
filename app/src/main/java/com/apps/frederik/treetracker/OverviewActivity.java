@@ -24,14 +24,11 @@ import android.view.MenuItem;
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.FakeRepository;
+import com.apps.frederik.treetracker.Model.DataAccessLayer.DatabaseRepository;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 
-import java.util.Date;
-import java.util.List;
-
-import static com.apps.frederik.treetracker.Globals.UUID_DETAILED_MONITORED_OBJECT;
+import static com.apps.frederik.treetracker.Globals.UUID;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private MonitorServiceBinder _binder;
@@ -81,11 +78,17 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             navigationView.setCheckedItem(R.id.nav_listFragment);
         }
 
-        List<MonitoredObject> o = new FakeRepository(this).GenerateFakeModel();
-
         InstantiateFragmentByTag(_currentFragmentTag);
 
+
+        DatabaseRepository db = new DatabaseRepository("Test");
+        db.SetValue("hey");
+
+
+
         Intent intentService = new Intent(this, MonitorService.class);
+        // TODO add authentication. Should be userId instead of hardcoded user: "Fuzion"
+        intentService.putExtra(Globals.DATABASE_REFERENCE, "Users/Fuzion123");
         bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -100,28 +103,37 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onResume() {
         Log.d("OverviewActivity", "onResume");
-        LocalBroadcastManager.getInstance(this).registerReceiver(onSensorAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_SENSOR_ADDED));
-        LocalBroadcastManager.getInstance(this).registerReceiver(onReadingAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_MONITORED_OBJECT_ADDED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onSensorAddedReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReadingAddedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onMonitoredObjectAddedReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onMonitoredObjectRemoved);
         super.onPause();
     }
 
 
-    private BroadcastReceiver onSensorAddedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver onMonitoredObjectAddedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("OverviewActivity", "New Sensor Added");
+            String uuid = intent.getExtras().getString(Globals.UUID);
+
+            if(_isBoundToService){
+                _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
+            }
+            else{
+                throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+            }
+
+            Log.d("OverviewActivity", "monitoredObject added with uuid: " + uuid);
         }
     };
 
-    private BroadcastReceiver onReadingAddedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver onMonitoredObjectRemoved = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("OverviewActivity", "New Reading Added");
@@ -136,11 +148,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (MonitorServiceBinder) binder;
             _isBoundToService = true;
-
-            if(_currentFragement == null) return;
-
-            List<MonitoredObject> objects = _binder.GetAllMonitoredObjects();
-            _currentFragement.SetData(objects);
         }
 
         @Override
@@ -220,14 +227,14 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 .commit();
 
         if(_isBoundToService) {
-            _currentFragement.SetData(_binder.GetAllMonitoredObjects());
+            _currentFragement.SetAllData(_binder.GetAllMonitoredObjects());
         }
     }
 
     @Override
     public void onListFragmentInteraction(MonitoredObject item) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(UUID_DETAILED_MONITORED_OBJECT, item.getUUID());
+        intent.putExtra(UUID, item.getUUID());
         startActivity(intent);
     }
 
