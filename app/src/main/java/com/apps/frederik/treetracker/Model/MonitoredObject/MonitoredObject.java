@@ -94,13 +94,13 @@ public class MonitoredObject {
                     MonitoredProperty m = it.next();
 
                     if(m.equals(newProp)){
-                        newProp.SetupDatabaseListeners(_dBRef.child("MonitoredProperties").child(dataSnapshot.getKey()), _context); // TODO this is a dirty hack to initialize listeners for already added properties
+                        m.SetupDatabaseListeners(_dBRef.child("MonitoredProperties").child(dataSnapshot.getKey()), _context); // TODO this is a dirty hack to initialize listeners for already added properties
                         return; // already added from initial pull
                     }
                 }
 
-                newProp.SetupDatabaseListeners(_dBRef.child("MonitoredProperties").child(dataSnapshot.getKey()),_context);
                 MonitoredProperties.add(newProp); // adds a new MonitoredProperty
+                MonitoredProperties.get(MonitoredProperties.size()-1).SetupDatabaseListeners(_dBRef.child("MonitoredProperties").child(dataSnapshot.getKey()),_context);
 
                 Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_MON_PROPERTY);
                 LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);

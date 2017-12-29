@@ -25,8 +25,9 @@ import com.google.firebase.database.Exclude;
 public class MonitoredProperty {
     private String Identifier;
     private List<Reading> Readings = new ArrayList<>();
-    private DatabaseReference _dBRef;
-    private Context _context;
+
+    private transient DatabaseReference _dBRef;
+    private transient Context _context;
 
     public String getIdentifier() {
         return Identifier;
@@ -60,7 +61,6 @@ public class MonitoredProperty {
         return false;
     }
 
-    @Exclude
     public void SetupDatabaseListeners(DatabaseReference ref, Context con){
         _dBRef = ref;
         _context = con;
@@ -86,28 +86,21 @@ public class MonitoredProperty {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Reading newReading = dataSnapshot.getValue(Reading.class);
                 if(Readings.remove(newReading)){
                     Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_READING_REMOVED);
+                    broadcast.putExtra(Globals.IDENTIFER, MonitoredProperty.this.getIdentifier());
                     LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
                 }
             }
-
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 }

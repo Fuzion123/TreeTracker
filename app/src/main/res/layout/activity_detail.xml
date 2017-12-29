@@ -6,33 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.apps.frederik.treetracker.DetailActivity">
 
-    <TextView
-        android:id="@+id/textViewDetailHeadline"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/title_historical_data"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="16dp"/>
-
-    <TextView
-        android:id="@+id/textViewYAxis"
-        android:layout_width="wrap_content"
-        android:layout_height="20dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/Y_axis_title_humidity"
-        app:layout_constraintBottom_toTopOf="@+id/fragment_container_detail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDetailHeadline" />
-
     <FrameLayout
         android:id="@+id/fragment_container_detail"
         android:layout_width="wrap_content"
@@ -45,7 +18,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDetailHeadline"
-        app:layout_constraintVertical_bias="0.13999999"></FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"></FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

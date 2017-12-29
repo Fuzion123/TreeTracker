@@ -21,9 +21,9 @@ import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 public class DetailActivity extends AppCompatActivity {
     private MonitorServiceBinder _binder;
     private boolean _isBoundToService;
-    private MonitoredObject _object;
     private String UUID = null;
     private GraphFragment graphFragment;
+    private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +38,24 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void Initialize(){
-        _object = _binder.GetMonitoredObjectFor(UUID);
+        MonitoredObject obj = _binder.GetMonitoredObjectFor(UUID);
 
-        if(_object.getMonitoredProperties().size() == 0)
+        if(obj.getMonitoredProperties().size() == 0)
         {
             Toast.makeText(this, "No readings is yet available!", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
+        graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentByTag(GRAPH_FRAGMENT_TAG);
+
+        if(graphFragment != null) return;
+
         graphFragment = new GraphFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_detail, graphFragment).commit();
-        graphFragment.SetMonitoredProperty(_object.getMonitoredProperties().get(0));
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container_detail, graphFragment, GRAPH_FRAGMENT_TAG)
+                .commit();
+        graphFragment.UpdateGraph(obj.getMonitoredProperties().get(0)); // TODO hardcoded to just use the first MonitoredProperty (Humidity)
     }
 
     private ServiceConnection _connection = new ServiceConnection() {
@@ -88,22 +94,14 @@ public class DetailActivity extends AppCompatActivity {
     private BroadcastReceiver onNewReadingAdded = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(_isBoundToService){
-                String identifier = intent.getExtras().getString(Globals.IDENTIFER);
-                MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UUID, identifier);
-                int lastVal = prop.getReadings().size();
-                graphFragment.AddReading(prop.getReadings().get(lastVal-1));
-            }
-            else{
-                throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
-            }
+            UpdateGraphFragment(intent);
         }
     };
 
     private BroadcastReceiver onReaddingRemoved = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("OverviewActivity", "New Reading Added");
+        UpdateGraphFragment(intent);
         }
     };
 
@@ -113,5 +111,16 @@ public class DetailActivity extends AppCompatActivity {
             unbindService(_connection);
         }
         super.onDestroy();
+    }
+
+    private void UpdateGraphFragment(Intent intent){
+        if(_isBoundToService){
+            String identifier = intent.getExtras().getString(Globals.IDENTIFER);
+            MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UUID, identifier);
+            graphFragment.UpdateGraph(prop);
+        }
+        else{
+            throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+        }
     }
 }
