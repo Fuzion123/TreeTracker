@@ -113,7 +113,8 @@ public class MapFragment extends MonitoredObjectFragment {
             Marker m = _googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
                     .anchor(0.5f,0.5f)
-                    .title(obj.getDescription() + "\ngo to details")
+                    .title(obj.getDescription())
+                    .snippet("go to details...")
                     .draggable(false)
                     .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMetadata().getType()))));
 

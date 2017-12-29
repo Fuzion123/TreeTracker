@@ -21,7 +21,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ListFragment extends MonitoredObjectFragment implements IMonitoredObjectDataUpdater {
+public class ListFragment extends MonitoredObjectFragment {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -97,13 +97,14 @@ public class ListFragment extends MonitoredObjectFragment implements IMonitoredO
 
     @Override
     public void AddMonitoredObject(MonitoredObject obj) {
-        _objects.add(obj);
+        if(!_objects.contains(obj)){
+            _objects.add(obj);
+        }
 
         if(_recyclerView == null) return;
 
-        //((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddData(obj);
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
         _recyclerView.getAdapter().notifyDataSetChanged();
-
     }
 
     @Override
@@ -112,7 +113,17 @@ public class ListFragment extends MonitoredObjectFragment implements IMonitoredO
 
         if(_recyclerView == null) return;
 
-        //((MyRecyclerViewAdapter)_recyclerView.getAdapter()).AddAllData(objs);
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
+        _recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void UpdateFragment(List<MonitoredObject> objs) {
+        _objects = objs;
+
+        if(_recyclerView == null) return;
+
+        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
 

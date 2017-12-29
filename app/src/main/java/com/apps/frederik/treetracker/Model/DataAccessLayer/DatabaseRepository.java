@@ -56,11 +56,14 @@ public class DatabaseRepository {
                 Log.d("DB", "onChildRemoved, key: " + dataSnapshot.getKey());
                 MonitoredObject obj = dataSnapshot.getValue(MonitoredObject.class);
 
-                // obj was actually removed
-                if(_objects.remove(obj)){
-                    Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED);
-                    broadcast.putExtra(Globals.UUID, obj.getUUID());
-                    LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
+                int cnt = _objects.size();
+                for(int i = 0; i<cnt; i++){
+                    if(_objects.get(i).getUUID().equals(obj.getUUID())){
+                        _objects.remove(i);
+                        Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED);
+                        broadcast.putExtra(Globals.UUID, obj.getUUID());
+                        LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
+                    }
                 }
             }
             @Override

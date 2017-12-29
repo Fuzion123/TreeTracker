@@ -19,6 +19,14 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         mListener = listener;
     }
 
+    public List<MonitoredObject> GetMonitoredObjects(){
+        return mValues;
+    }
+
+    public void SetMonitoredObjects(List<MonitoredObject> objs){
+        mValues = objs;
+    }
+
     @Override
     public MonitoredObjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())

@@ -19,4 +19,9 @@ public class MonitoredObjectFragment extends Fragment implements IMonitoredObjec
     public void SetAllData(List<MonitoredObject> objs) {
 
     }
+
+    @Override
+    public void UpdateFragment(List<MonitoredObject> objs) {
+
+    }
 }

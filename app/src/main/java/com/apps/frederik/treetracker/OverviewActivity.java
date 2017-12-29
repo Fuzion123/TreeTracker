@@ -33,6 +33,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.apps.frederik.treetracker.Globals.UUID;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
@@ -105,6 +108,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_MONITORED_OBJECT_ADDED));
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
+        if(_isBoundToService){
+            _currentFragement.UpdateFragment(_binder.GetAllMonitoredObjects());
+        }
+
         super.onResume();
     }
 
@@ -121,23 +128,26 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onReceive(Context context, Intent intent) {
             String uuid = intent.getExtras().getString(Globals.UUID);
 
-            if(_isBoundToService){
-                _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
-            }
-            else{
-                throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
-            }
+            if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
-            Log.d("OverviewActivity", "monitoredObject added with uuid: " + uuid);
+            _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
         }
     };
 
     private BroadcastReceiver onMonitoredObjectRemoved = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("OverviewActivity", "New Reading Added");
+            if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+
+            _currentFragement.UpdateFragment(_binder.GetAllMonitoredObjects());
         }
     };
+
+    private void InitializeFragment(){
+        if(!_isBoundToService) throw new RuntimeException("should be bound to service!");
+        List<MonitoredObject> objs = _binder.GetAllMonitoredObjects();
+        _currentFragement.UpdateFragment(objs);
+    }
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection _connection = new ServiceConnection() {
@@ -147,6 +157,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (MonitorServiceBinder) binder;
             _isBoundToService = true;
+            //InitializeFragment();
         }
 
         @Override

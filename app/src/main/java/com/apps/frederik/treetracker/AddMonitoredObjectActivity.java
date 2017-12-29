@@ -182,35 +182,6 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         double currentLatitude = lastKnownLocation.getLatitude();
         Coordinate gpsCoordinate = new Coordinate(currentLatitude, currentLongitude);
 
-        // TODO update this
-        /*
-        // TODO dont do this check heheheheh
-        SensorManagement manager = new SensorManagement();
-        int cnt = FakeDatabaseRepository.UnmappedSensors.size();
-        if(cnt == 0){
-            finish(); // ops: finish doesnt necessarily return from method!
-            return;
-        }
-
-        uuid = FakeDatabaseRepository.UnmappedSensors.get(cnt-1).GetUuid();
-        SensorManagement.MapSensorResult result = manager.MapExistingSensor(uuid, gpsCoordinate);
-
-        switch (result){
-            case SENSOR_SUCCESSFULLY_MAPPED:{
-                Toast.makeText(this, editTextSensorName.getText() + " was successfully added!", Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case WAS_ALREADY_MAPPED:{
-                Toast.makeText(this, editTextSensorName.getText() + " was already added!", Toast.LENGTH_SHORT).show();
-                break;
-            }
-            case NO_SENSOR_WITH_THAT_UUID_ON_DATABASE:{
-                Toast.makeText(this, editTextSensorName.getText() + " with uuid: "+uuid+" was not found on the database!", Toast.LENGTH_SHORT).show();
-                break;
-            }
-        }
-        */
-
         if(!_isBoundToService) throw new RuntimeException("AddMonitoredObjectActivity: is not bound to service where it should be!");
 
         if(!_binder.SensorPackageWithUuidExists(uuid)){
