@@ -16,12 +16,12 @@ public class MonitoredObjectFragment extends Fragment implements IMonitoredObjec
     }
 
     @Override
-    public void SetAllData(List<MonitoredObject> objs) {
+    public void RemoveMonitoredObjectFor(String uuid) {
 
     }
 
     @Override
-    public void UpdateFragment(List<MonitoredObject> objs) {
+    public void RefreshAllMonitoredObject(List<MonitoredObject> objs) {
 
     }
 }

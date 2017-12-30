@@ -97,14 +97,16 @@ public class MapFragment extends MonitoredObjectFragment {
         SetMapZoom();
     }
 
+
     @Override
-    public void SetAllData(List<MonitoredObject> objs) {
+    public void RefreshAllMonitoredObject(List<MonitoredObject> objs) {
         _objects = objs;
         for (MonitoredObject obj:_objects) {
             AddMarker(obj);
         }
         SetMapZoom();
     }
+
 
     private void AddMarker(MonitoredObject obj){
         if(_googleMap != null){

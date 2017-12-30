@@ -108,17 +108,20 @@ public class ListFragment extends MonitoredObjectFragment {
     }
 
     @Override
-    public void SetAllData(List<MonitoredObject> objs) {
-        _objects = objs;
-
-        if(_recyclerView == null) return;
-
-        ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
-        _recyclerView.getAdapter().notifyDataSetChanged();
+    public void RemoveMonitoredObjectFor(String uuid){
+        int cnt = _objects.size();
+        for(int i = 0; i<cnt;i++){
+            if(_objects.get(i).getUUID().equals(uuid)){
+                _objects.remove(i);
+                ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
+                _recyclerView.getAdapter().notifyDataSetChanged();
+                return;
+            }
+        }
     }
 
     @Override
-    public void UpdateFragment(List<MonitoredObject> objs) {
+    public void RefreshAllMonitoredObject(List<MonitoredObject> objs) {
         _objects = objs;
 
         if(_recyclerView == null) return;
@@ -126,6 +129,7 @@ public class ListFragment extends MonitoredObjectFragment {
         ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

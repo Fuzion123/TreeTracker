@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface IMonitoredObjectDataUpdater {
     void AddMonitoredObject(MonitoredObject obj);
-    void SetAllData(List<MonitoredObject> objs);
-    void UpdateFragment(List<MonitoredObject> objs);
+    void RemoveMonitoredObjectFor(String uuid);
+    void RefreshAllMonitoredObject(List<MonitoredObject> objs);
 }

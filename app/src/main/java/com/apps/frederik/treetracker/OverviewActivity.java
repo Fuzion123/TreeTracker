@@ -109,7 +109,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
         if(_isBoundToService){
-            _currentFragement.UpdateFragment(_binder.GetAllMonitoredObjects());
+            _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
         }
 
         super.onResume();
@@ -139,15 +139,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onReceive(Context context, Intent intent) {
             if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
-            _currentFragement.UpdateFragment(_binder.GetAllMonitoredObjects());
+            _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
         }
     };
-
-    private void InitializeFragment(){
-        if(!_isBoundToService) throw new RuntimeException("should be bound to service!");
-        List<MonitoredObject> objs = _binder.GetAllMonitoredObjects();
-        _currentFragement.UpdateFragment(objs);
-    }
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection _connection = new ServiceConnection() {
@@ -157,7 +151,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (MonitorServiceBinder) binder;
             _isBoundToService = true;
-            //InitializeFragment();
         }
 
         @Override
@@ -237,7 +230,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 .commit();
 
         if(_isBoundToService) {
-            _currentFragement.SetAllData(_binder.GetAllMonitoredObjects());
+            _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
         }
     }
 
