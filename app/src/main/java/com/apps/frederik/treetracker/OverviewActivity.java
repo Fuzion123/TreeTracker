@@ -126,10 +126,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver onMonitoredObjectAddedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String uuid = intent.getExtras().getString(Globals.UUID);
-
             if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
+            String uuid = intent.getExtras().getString(Globals.UUID);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
         }
     };
@@ -139,7 +138,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onReceive(Context context, Intent intent) {
             if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
-            _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
+            String uuid = intent.getExtras().getString(Globals.UUID);
+            _currentFragement.RemoveMonitoredObjectFor(uuid);
         }
     };
 

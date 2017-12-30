@@ -32,7 +32,7 @@ public class DatabaseRepository {
     private Context _context;
 
     public DatabaseRepository(String relativePath, Context context){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         _dBRef = database.getReference(relativePath);
         _context = context;
 

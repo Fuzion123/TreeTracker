@@ -122,7 +122,7 @@ public class ListFragment extends MonitoredObjectFragment {
 
     @Override
     public void RefreshAllMonitoredObject(List<MonitoredObject> objs) {
-        _objects = objs;
+        _objects = new ArrayList<>(objs);
 
         if(_recyclerView == null) return;
 
