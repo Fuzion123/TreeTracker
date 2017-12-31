@@ -119,11 +119,10 @@ public class GraphFragment extends Fragment {
         _graph.getViewport().setScalable(true);
         _graph.setTitle("Historical data");
         _graph.setTitleTextSize(60f);
-        _graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
-        //_graph.getGridLabelRenderer().setVerticalAxisTitle(_property.getIdentifier()); // for example humidity
+        _graph.getGridLabelRenderer().setHorizontalAxisTitle("Time"); // TODO hardcoded to time!
+        _graph.getGridLabelRenderer().setVerticalAxisTitle("Humidity"); // TODO hardcoded to Humidity!
         _graph.getGridLabelRenderer().setPadding(70); // add padding for the graph to be fully shown for the max datapoint to be seen on the graph also
         _graph.getGridLabelRenderer().setHorizontalLabelsAngle(15); // makes horizontal date labels angled ( due to long label names)
-        _graph.getGridLabelRenderer().setNumHorizontalLabels(6);
 
         _seriesPoint.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override

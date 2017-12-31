@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
 import com.apps.frederik.treetracker.Model.PropertiesReading.PropertiesReading;
@@ -19,6 +20,7 @@ import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.jjoe64.graphview.series.DataPoint;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,17 +28,23 @@ import java.util.List;
 public class DetailActivity extends AppCompatActivity {
     private MonitorService.DetailActivityBinder _binder;
     private boolean _isBoundToService;
-    private String UniqueDiscription = null;
+    private String UniqueDiscription;
+    private String DetailType;
     private GraphFragment graphFragment;
     private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
+    private TextView txtViewCurrent;
+    private TextView txtViewCurrentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         setTitle(Globals.APP_NAME);
+        txtViewCurrent = findViewById(R.id.textViewCurrent);
+        txtViewCurrentDate = findViewById(R.id.textViewCurrentDate);
 
         UniqueDiscription = getIntent().getExtras().getString(Globals.UNIQUE_DESCRIPTION);
+        DetailType = getIntent().getExtras().getString(Globals.DETAIL_TYPE);
 
         Intent service = new Intent(this, MonitorService.class);
         bindService(service,_connection, Context.BIND_AUTO_CREATE);
@@ -113,9 +121,9 @@ public class DetailActivity extends AppCompatActivity {
     private void UpdateGraphFragment(Intent intent){
         if(_isBoundToService){
 
+            // updating the historical values
             List<PropertiesReading> reads = new ArrayList<>(_binder.GetHistorical());
             List<DataPoint> data = new ArrayList<>();
-
 
             for (PropertiesReading r : reads)
             {
@@ -125,6 +133,14 @@ public class DetailActivity extends AppCompatActivity {
             }
             graphFragment.AddData(data);
 
+            // update the current value
+            PropertiesReading current = _binder.GetCurrent();
+            SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd. MMM yyyy  hh:mm:ss aa");
+            String readableDate = formatter.format(TimeStampHelper.get_dataTime(current.getTimeStamp()));
+            String value = current.getProperties().get("humidity") + "%"; // TODO hardcoded!!
+
+            txtViewCurrent.setText(getString(R.string.current)+ " " + DetailType + ": " + value);
+            txtViewCurrentDate.setText(getString(R.string.date) + ": " + readableDate);
         }
         else{
             throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");

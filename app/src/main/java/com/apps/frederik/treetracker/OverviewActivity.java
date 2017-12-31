@@ -24,8 +24,6 @@ import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
-import static com.apps.frederik.treetracker.Globals.UNIQUE_DESCRIPTION;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private MonitorService.OverviewActivityBinder _binder;
@@ -226,7 +224,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public void onListFragmentInteraction(MonitoredObject item) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(UNIQUE_DESCRIPTION, item.getUniqueDescription());
+        intent.putExtra(Globals.UNIQUE_DESCRIPTION, item.getUniqueDescription());
+        intent.putExtra(Globals.DETAIL_TYPE, "humidity"); // TODO hardcoded to humidity
         startActivity(intent);
     }
 

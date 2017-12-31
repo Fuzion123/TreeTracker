@@ -33,4 +33,8 @@
     <string name="text_treetracker">TreeTracker</string>
     <string name="text_sensor_content">content</string>
 
+
+    <!-- DetailOverview -->
+    <string name="current">Current</string>
+    <string name="date">Date</string>
 </resources>

@@ -78,6 +78,7 @@ public class MapFragment extends MonitoredObjectFragment {
                                 String uuid = _objects.get(i).getUniqueDescription();
                                 Intent detail = new Intent(getContext(), DetailActivity.class);
                                 detail.putExtra(Globals.UNIQUE_DESCRIPTION, uuid);
+                                detail.putExtra(Globals.DETAIL_TYPE, "humidity"); // TODO hardcoded to humidity type
                                 startActivity(detail);
                             }
                         }
