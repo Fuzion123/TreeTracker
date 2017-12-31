@@ -14,9 +14,13 @@ import android.util.Log;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
 import com.apps.frederik.treetracker.Model.PropertiesReading.PropertiesReading;
+import com.apps.frederik.treetracker.Model.Util.TimeStampHelper;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+import com.jjoe64.graphview.series.DataPoint;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
@@ -108,8 +112,19 @@ public class DetailActivity extends AppCompatActivity {
 
     private void UpdateGraphFragment(Intent intent){
         if(_isBoundToService){
-            //MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UniqueDiscription, identifier);
-            //graphFragment.UpdateGraph(prop);
+
+            List<PropertiesReading> reads = new ArrayList<>(_binder.GetHistorical());
+            List<DataPoint> data = new ArrayList<>();
+
+
+            for (PropertiesReading r : reads)
+            {
+                Date time = TimeStampHelper.get_dataTime(r.getTimeStamp());
+                double value = Double.valueOf(r.getProperties().get("humidity"));
+                data.add(new DataPoint(time, value));
+            }
+            graphFragment.AddData(data);
+
         }
         else{
             throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");

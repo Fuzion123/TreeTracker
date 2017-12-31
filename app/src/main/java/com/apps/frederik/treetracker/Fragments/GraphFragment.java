@@ -64,22 +64,18 @@ public class GraphFragment extends Fragment {
         return _view;
     }
 
-    /*
-    public void UpdateGraph(MonitoredProperty prop) {
-        _property = prop;
+
+    public void AddData(List<DataPoint> data) {
+        this.data = new ArrayList<>(data);
 
         if(_graph == null) return;
 
         PopulateGraph();
     }
-    */
+
 
     private void PopulateGraph(){
         if(data.size() == 0) return;
-
-        /*for (Reading r : _property.getReadings()){
-            data.add(new DataPoint(TimeStampHelper.get_dataTime(r.getTimeStamp()), r.getData()));
-        }*/
 
         DataPoint[] dataArray = data.toArray(new DataPoint[data.size()]);
         _seriesLine.resetData(dataArray);
@@ -119,7 +115,7 @@ public class GraphFragment extends Fragment {
     }
 
     private void SetupGraphLayout(){
-        _graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("dd/MM")));
+        _graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("dd/MM  hh:mm aa")));
         _graph.getViewport().setScalable(true);
         _graph.setTitle("Historical data");
         _graph.setTitleTextSize(60f);
@@ -127,13 +123,15 @@ public class GraphFragment extends Fragment {
         //_graph.getGridLabelRenderer().setVerticalAxisTitle(_property.getIdentifier()); // for example humidity
         _graph.getGridLabelRenderer().setPadding(70); // add padding for the graph to be fully shown for the max datapoint to be seen on the graph also
         _graph.getGridLabelRenderer().setHorizontalLabelsAngle(15); // makes horizontal date labels angled ( due to long label names)
+        _graph.getGridLabelRenderer().setNumHorizontalLabels(6);
 
         _seriesPoint.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
-                /*
-                String msg;
 
+                String msg = "Humidity is " + dataPoint.getY() + "%";
+
+                /*
                 switch (_property.getIdentifier()){
                     case "Humidity" : {
                         msg = "Humidity is " + dataPoint.getY() + "%";
@@ -146,12 +144,12 @@ public class GraphFragment extends Fragment {
                         msg = "Data value: " + dataPoint.getY();
                     }
                 }
+                */
 
-                SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd. MMM yyyy  hh:mm");
+                SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd. MMM yyyy  hh:mm:ss aa");
                 String readableDate = formatter.format(dataPoint.getX());
 
                 Toast.makeText(getActivity(), msg + "\n" + readableDate, Toast.LENGTH_LONG).show();
-                */
             }
         });
     }
