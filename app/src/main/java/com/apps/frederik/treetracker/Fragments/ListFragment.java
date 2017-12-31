@@ -128,6 +128,10 @@ public class ListFragment extends MonitoredObjectFragment {
         _recyclerView.getAdapter().notifyDataSetChanged();
     }
 
+    @Override
+    public List<MonitoredObject> GetMonitoredObject(){
+        return _objects;
+    }
 
     /**
      * This interface must be implemented by activities that contain this

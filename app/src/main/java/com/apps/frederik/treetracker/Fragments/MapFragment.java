@@ -108,6 +108,11 @@ public class MapFragment extends MonitoredObjectFragment {
         SetMapZoom();
     }
 
+    @Override
+    public List<MonitoredObject> GetMonitoredObject(){
+        return _objects;
+    }
+
 
     private void AddMarker(MonitoredObject obj){
         if(_googleMap != null){

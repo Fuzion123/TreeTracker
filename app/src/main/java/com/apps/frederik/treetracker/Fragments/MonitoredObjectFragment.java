@@ -24,4 +24,9 @@ public class MonitoredObjectFragment extends Fragment implements IMonitoredObjec
     public void RefreshAllMonitoredObject(List<MonitoredObject> objs) {
 
     }
+
+    @Override
+    public List<MonitoredObject> GetMonitoredObject() {
+        return null;
+    }
 }

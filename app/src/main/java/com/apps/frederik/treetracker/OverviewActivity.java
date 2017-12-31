@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -20,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
@@ -33,6 +38,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private final String FRAGMENT_MAP_TAG = "com.apps.frederik.treetracker.mapFragment";
     private final String LAST_FRAGMENT_ACTIVE = "com.apps.frederik.treetracker.last.fragment.active";
     private String _currentFragmentTag = FRAGMENT_LIST_TAG; // default behavior
+    private ProgressBar loadingAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,12 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         setContentView(R.layout.activity_overview);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // setting up the loading bar
+        loadingAnimation = findViewById(R.id.loadingAnimation);
+        Drawable progressDrawable = loadingAnimation.getIndeterminateDrawable().mutate();
+        progressDrawable.setColorFilter(getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+        loadingAnimation.setIndeterminateDrawable(progressDrawable);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +111,14 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
         }
 
+        int visibility = View.VISIBLE;
+        if(_currentFragement != null){
+            if(_currentFragement.GetMonitoredObject().size() > 0){
+                visibility= View.GONE;
+            }
+        }
+        loadingAnimation.setVisibility(visibility);
+
         super.onResume();
     }
 
@@ -117,6 +137,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
             String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
+            loadingAnimation.setVisibility(View.GONE);
         }
     };
 

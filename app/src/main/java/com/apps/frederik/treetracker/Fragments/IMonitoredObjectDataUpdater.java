@@ -12,4 +12,5 @@ public interface IMonitoredObjectDataUpdater {
     void AddMonitoredObject(MonitoredObject obj);
     void RemoveMonitoredObjectFor(String uuid);
     void RefreshAllMonitoredObject(List<MonitoredObject> objs);
+    List<MonitoredObject> GetMonitoredObject();
 }
