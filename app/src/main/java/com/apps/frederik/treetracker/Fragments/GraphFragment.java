@@ -12,13 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
-import com.apps.frederik.treetracker.Model.Reading.Reading;
-import com.apps.frederik.treetracker.Model.Util.TimeStampHelper;
 import com.apps.frederik.treetracker.R;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
@@ -39,7 +34,7 @@ import java.util.List;
 // using Graph View from: https://github.com/appsthatmatter/GraphView
 // All usage is inspired by guides from: http://www.android-graphview.org/
 public class GraphFragment extends Fragment {
-    private MonitoredProperty _property;
+    private List<DataPoint> data = new ArrayList<>();
     private GraphView _graph;
     private PointsGraphSeries<DataPoint> _seriesPoint = new PointsGraphSeries<DataPoint>();
     private LineGraphSeries<DataPoint> _seriesLine = new LineGraphSeries<DataPoint>();
@@ -57,7 +52,7 @@ public class GraphFragment extends Fragment {
 
             Gson gson = new Gson();
 
-            _property = gson.fromJson(propertyAsJson, MonitoredProperty.class);
+            //_property = gson.fromJson(propertyAsJson, MonitoredProperty.class);
         }
 
         _view = inflater.inflate(R.layout.fragment_graph, container, false);
@@ -69,6 +64,7 @@ public class GraphFragment extends Fragment {
         return _view;
     }
 
+    /*
     public void UpdateGraph(MonitoredProperty prop) {
         _property = prop;
 
@@ -76,14 +72,15 @@ public class GraphFragment extends Fragment {
 
         PopulateGraph();
     }
+    */
 
     private void PopulateGraph(){
-        if(_property.getReadings().size() == 0) return;
+        if(data.size() == 0) return;
 
-        List<DataPoint> data = new ArrayList<>();
-        for (Reading r : _property.getReadings()){
+        /*for (Reading r : _property.getReadings()){
             data.add(new DataPoint(TimeStampHelper.get_dataTime(r.getTimeStamp()), r.getData()));
-        }
+        }*/
+
         DataPoint[] dataArray = data.toArray(new DataPoint[data.size()]);
         _seriesLine.resetData(dataArray);
         _seriesPoint.resetData(dataArray);
@@ -127,14 +124,16 @@ public class GraphFragment extends Fragment {
         _graph.setTitle("Historical data");
         _graph.setTitleTextSize(60f);
         _graph.getGridLabelRenderer().setHorizontalAxisTitle("Time");
-        _graph.getGridLabelRenderer().setVerticalAxisTitle(_property.getIdentifier()); // for example humidity
+        //_graph.getGridLabelRenderer().setVerticalAxisTitle(_property.getIdentifier()); // for example humidity
         _graph.getGridLabelRenderer().setPadding(70); // add padding for the graph to be fully shown for the max datapoint to be seen on the graph also
         _graph.getGridLabelRenderer().setHorizontalLabelsAngle(15); // makes horizontal date labels angled ( due to long label names)
 
         _seriesPoint.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
             public void onTap(Series series, DataPointInterface dataPoint) {
+                /*
                 String msg;
+
                 switch (_property.getIdentifier()){
                     case "Humidity" : {
                         msg = "Humidity is " + dataPoint.getY() + "%";
@@ -152,6 +151,7 @@ public class GraphFragment extends Fragment {
                 String readableDate = formatter.format(dataPoint.getX());
 
                 Toast.makeText(getActivity(), msg + "\n" + readableDate, Toast.LENGTH_LONG).show();
+                */
             }
         });
     }
@@ -161,9 +161,11 @@ public class GraphFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        /*
         Gson gson = new GsonBuilder().create();
         String propAsJson = gson.toJson(_property);
 
         outState.putString(ON_SAVED_INSTANCE_PROPERTY, propAsJson);
+        */
     }
 }

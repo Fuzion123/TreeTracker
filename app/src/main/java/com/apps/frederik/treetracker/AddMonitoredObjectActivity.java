@@ -24,28 +24,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.apps.frederik.treetracker.Model.Metadata.Metadata;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObjectToFirebase;
-import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
 import com.apps.frederik.treetracker.Model.Util.Coordinate;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class AddMonitoredObjectActivity extends AppCompatActivity {
 
-    private MonitorService.MonitorServiceBinder _binder;
+    private MonitorService.AddMonitoredObjectActivityBinder _binder;
     private boolean _isBoundToService;
-
-
     private static final int RC_BARCODE_CAPTURE = 1234;
     private static final int RC_HANDLE_LOCATION_PERM = 4321;
     private static final String TAG = "AddMonitoredObjectActivity";
@@ -144,7 +132,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            _binder = (MonitorService.MonitorServiceBinder) binder;
+            _binder = (MonitorService.AddMonitoredObjectActivityBinder) binder;
             _isBoundToService = true;
         }
 
@@ -175,6 +163,8 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
     }
 
     private void FinalizeAddingSensor(){
+        throw new UnsupportedOperationException();
+        /*
         if (!checkLocationPermission())
             return;
         lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
@@ -184,25 +174,16 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
 
         if(!_isBoundToService) throw new RuntimeException("AddMonitoredObjectActivity: is not bound to service where it should be!");
 
-        if(!_binder.SensorPackageWithUuidExists(uuid)){
-            Toast.makeText(this, "No tracker was found with that UUID. No Tracker was added!", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
 
         MonitoredObject obj = new MonitoredObject();
         obj.setCoordinate(gpsCoordinate);
-        obj.setMetadata(new Metadata("tree")); // TODO now, type is only hardcoded to type = tree!
-        obj.setDescription(editTextSensorName.getText().toString());
-        obj.setUUID(uuid);
-        obj.setMonitorGedProperties(new ArrayList<MonitoredProperty>());
-
+        obj.setUniqueDescription(editTextSensorName.getText().toString());
 
         _binder.AddMonitoredObject(obj);
 
         finish();
         return;
+        */
     }
 
     private boolean checkLocationPermission() {

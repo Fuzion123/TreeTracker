@@ -20,26 +20,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
-import com.apps.frederik.treetracker.Model.DataAccessLayer.DatabaseRepository;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.apps.frederik.treetracker.Globals.UUID;
+import static com.apps.frederik.treetracker.Globals.UNIQUE_DESCRIPTION;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
-    private MonitorServiceBinder _binder;
+    private MonitorService.OverviewActivityBinder _binder;
     private boolean _isBoundToService;
     private MonitoredObjectFragment _currentFragement;
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
@@ -128,7 +117,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onReceive(Context context, Intent intent) {
             if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
-            String uuid = intent.getExtras().getString(Globals.UUID);
+            String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
         }
     };
@@ -138,7 +127,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         public void onReceive(Context context, Intent intent) {
             if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
 
-            String uuid = intent.getExtras().getString(Globals.UUID);
+            String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.RemoveMonitoredObjectFor(uuid);
         }
     };
@@ -149,7 +138,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            _binder = (MonitorServiceBinder) binder;
+            _binder = (MonitorService.OverviewActivityBinder) binder;
             _isBoundToService = true;
         }
 
@@ -237,7 +226,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     @Override
     public void onListFragmentInteraction(MonitoredObject item) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(UUID, item.getUUID());
+        intent.putExtra(UNIQUE_DESCRIPTION, item.getUniqueDescription());
         startActivity(intent);
     }
 

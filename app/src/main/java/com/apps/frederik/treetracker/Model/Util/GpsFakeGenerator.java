@@ -9,7 +9,7 @@ import java.util.Random;
 public final class GpsFakeGenerator {
     private static final Random _random = new Random();
 
-    public static Coordinate GenerateCoordinates(){
+    public static com.apps.frederik.treetracker.Model.Util.Coordinate GenerateCoordinates(){
         double latRangeMin = AarhusLatitudeLongitudeConstrains.LatitudeLowerBound;
         double latRangeMax= AarhusLatitudeLongitudeConstrains.LatitudeUpperBound;
         double longRangeMin = AarhusLatitudeLongitudeConstrains.LongitudeLeftBound;
@@ -20,6 +20,6 @@ public final class GpsFakeGenerator {
         double latitude = latRangeMin + (latRangeMax - latRangeMin) * _random.nextDouble();
         double longitude = longRangeMin + (longRangeMax - longRangeMin) * _random.nextDouble();
 
-        return new Coordinate(latitude, longitude);
+        return new com.apps.frederik.treetracker.Model.Util.Coordinate(latitude, longitude);
     }
 }

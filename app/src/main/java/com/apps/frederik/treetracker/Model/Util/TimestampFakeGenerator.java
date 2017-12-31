@@ -1,9 +1,5 @@
 package com.apps.frederik.treetracker.Model.Util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created by Frederik on 12/10/2017.
  */

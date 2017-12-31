@@ -8,10 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +109,7 @@ public class ListFragment extends MonitoredObjectFragment {
     public void RemoveMonitoredObjectFor(String uuid){
         int cnt = _objects.size();
         for(int i = 0; i<cnt;i++){
-            if(_objects.get(i).getUUID().equals(uuid)){
+            if(_objects.get(i).getUniqueDescription().equals(uuid)){
                 _objects.remove(i);
                 ((MyRecyclerViewAdapter)_recyclerView.getAdapter()).SetMonitoredObjects(_objects);
                 _recyclerView.getAdapter().notifyDataSetChanged();

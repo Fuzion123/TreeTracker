@@ -49,7 +49,7 @@ public class FakeRepository {
                 line = reader.readLine();
             }
         } catch (Exception e) {
-            Log.e("Reading JSON ", "Unhandled exception while using JSONResourceReader", e);
+            Log.e("PropertiesReading JSON ", "Unhandled exception while using JSONResourceReader", e);
         } finally {
             try {
                 resourceReader.close();

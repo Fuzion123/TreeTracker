@@ -1,8 +1,5 @@
 package com.apps.frederik.treetracker.Model.Util;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.util.Calendar;
 import java.util.Date;
 

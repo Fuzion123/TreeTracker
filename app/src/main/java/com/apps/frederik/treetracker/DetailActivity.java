@@ -11,17 +11,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
-import com.apps.frederik.treetracker.Model.MonitoredProperty.MonitoredProperty;
+import com.apps.frederik.treetracker.Model.PropertiesReading.PropertiesReading;
 import com.apps.frederik.treetracker.MonitorService.MonitorServiceBinder;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 
+import java.util.List;
+
 public class DetailActivity extends AppCompatActivity {
-    private MonitorServiceBinder _binder;
+    private MonitorService.DetailActivityBinder _binder;
     private boolean _isBoundToService;
-    private String UUID = null;
+    private String UniqueDiscription = null;
     private GraphFragment graphFragment;
     private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
 
@@ -31,21 +32,14 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         setTitle(Globals.APP_NAME);
 
-        UUID = getIntent().getExtras().getString(Globals.UUID);
+        UniqueDiscription = getIntent().getExtras().getString(Globals.UNIQUE_DESCRIPTION);
 
         Intent service = new Intent(this, MonitorService.class);
         bindService(service,_connection, Context.BIND_AUTO_CREATE);
     }
 
     private void Initialize(){
-        MonitoredObject obj = _binder.GetMonitoredObjectFor(UUID);
-
-        if(obj.getMonitoredProperties().size() == 0)
-        {
-            Toast.makeText(this, "No readings is yet available!", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
+        _binder.SetupPropertiesReadingLister(UniqueDiscription);
 
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentByTag(GRAPH_FRAGMENT_TAG);
 
@@ -55,7 +49,6 @@ public class DetailActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container_detail, graphFragment, GRAPH_FRAGMENT_TAG)
                 .commit();
-        graphFragment.UpdateGraph(obj.getMonitoredProperties().get(0)); // TODO hardcoded to just use the first MonitoredProperty (Humidity)
     }
 
     private ServiceConnection _connection = new ServiceConnection() {
@@ -63,7 +56,7 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            _binder = (MonitorService.MonitorServiceBinder) binder;
+            _binder = (MonitorService.DetailActivityBinder) binder;
             _isBoundToService = true;
             Initialize();
         }
@@ -115,9 +108,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private void UpdateGraphFragment(Intent intent){
         if(_isBoundToService){
-            String identifier = intent.getExtras().getString(Globals.IDENTIFER);
-            MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UUID, identifier);
-            graphFragment.UpdateGraph(prop);
+            //MonitoredProperty prop = _binder.GetMonitoredPropertyFor(DetailActivity.this.UniqueDiscription, identifier);
+            //graphFragment.UpdateGraph(prop);
         }
         else{
             throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");

@@ -37,7 +37,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     @Override
     public void onBindViewHolder(final MonitoredObjectViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mDiscriptionView.setText(mValues.get(position).getDescription());
+        holder.mDiscriptionView.setText(mValues.get(position).getUniqueDescription());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

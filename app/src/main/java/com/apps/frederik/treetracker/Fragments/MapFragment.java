@@ -75,9 +75,9 @@ public class MapFragment extends MonitoredObjectFragment {
                         for (int i = 0; i< cnt; i++)
                         {
                             if(_markers.get(i).equals(marker)){
-                                String uuid = _objects.get(i).getUUID();
+                                String uuid = _objects.get(i).getUniqueDescription();
                                 Intent detail = new Intent(getContext(), DetailActivity.class);
-                                detail.putExtra(Globals.UUID, uuid);
+                                detail.putExtra(Globals.UNIQUE_DESCRIPTION, uuid);
                                 startActivity(detail);
                             }
                         }
@@ -115,18 +115,16 @@ public class MapFragment extends MonitoredObjectFragment {
             Marker m = _googleMap.addMarker(new MarkerOptions()
                     .position(latLng)
                     .anchor(0.5f,0.5f)
-                    .title(obj.getDescription())
+                    .title(obj.getUniqueDescription())
                     .snippet("go to details...")
                     .draggable(false)
-                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage(obj.getMetadata().getType()))));
+                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage("tree")))); // TODO as of now, no meta data specifying type is implemented and tree is always used.
 
             _markers.add(m);
 
 
         }
     }
-
-
 
     private Bitmap findMarkerImage(String type){
         // to make image smaller
