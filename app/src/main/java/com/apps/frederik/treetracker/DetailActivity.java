@@ -96,6 +96,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
+
+
     private BroadcastReceiver onNewReadingAdded = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -115,6 +117,8 @@ public class DetailActivity extends AppCompatActivity {
         if(_isBoundToService){
             unbindService(_connection);
         }
+
+        _binder.RemovePropertiesReadingListener(UniqueDiscription);
         super.onDestroy();
     }
 

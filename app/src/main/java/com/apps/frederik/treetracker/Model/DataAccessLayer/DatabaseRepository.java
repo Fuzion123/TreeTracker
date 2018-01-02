@@ -3,6 +3,7 @@ package com.apps.frederik.treetracker.Model.DataAccessLayer;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.apps.frederik.treetracker.Globals;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
@@ -34,9 +35,6 @@ public class DatabaseRepository {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         _dBRef = database.getReference(relativePath);
         _context = context;
-
-        SetupDbListenerForMonitoredObjects();
-        //SetupDbListenersForPropertiesForMonitoredObject("tree_0000");
     }
 
     public List<MonitoredObject> GetAllMonitoredObjects(){
@@ -150,14 +148,18 @@ public class DatabaseRepository {
             }
             // else it is for "historical"
             else{
-                Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
+
                 _detailedMonitoredObject.setHistorical(new ArrayList<PropertiesReading>());
+
+                int cnt = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     _detailedMonitoredObject.getHistorical().add(PropertiesReadingFromDataSnapshot(snapshot));
-
-                    // notifies listeners that a new reading has been captured
-                    LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
                 }
+                Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
+                // notifies listeners that a new reading has been captured
+                LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
+                cnt++;
+                Log.d("test", "cnt: " + cnt);
             }
         }
 

@@ -115,6 +115,7 @@ public class GraphFragment extends Fragment {
     }
 
     private void SetupGraphLayout(){
+        // TODO so much hardcoded shit here.
         _graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("dd/MM  hh:mm aa")));
         _graph.getViewport().setScalable(true);
         _graph.setTitle("Historical data");
@@ -123,6 +124,10 @@ public class GraphFragment extends Fragment {
         _graph.getGridLabelRenderer().setVerticalAxisTitle("Humidity"); // TODO hardcoded to Humidity!
         _graph.getGridLabelRenderer().setPadding(70); // add padding for the graph to be fully shown for the max datapoint to be seen on the graph also
         _graph.getGridLabelRenderer().setHorizontalLabelsAngle(15); // makes horizontal date labels angled ( due to long label names)
+        _graph.getViewport().setYAxisBoundsManual(true);
+        _graph.getViewport().setMinY(0);
+        _graph.getViewport().setMaxY(100);
+
 
         _seriesPoint.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override

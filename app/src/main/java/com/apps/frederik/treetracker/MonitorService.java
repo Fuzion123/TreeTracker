@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MonitorService extends Service {//implements IModelEventListener {
     private IBinder _sensorBinder = new MonitorServiceBinder();
-    private DatabaseRepository _dBRepository;
+    private DatabaseRepository _dBRepository = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -20,17 +20,8 @@ public class MonitorService extends Service {//implements IModelEventListener {
     }
 
     @Override
-    public void onCreate() {
-
-        _dBRepository = new DatabaseRepository("/users/christ", this);
-
-        //_dBRepository = new DatabaseRepository("/users/christ", this);
-
-        super.onCreate();
-    }
-
-    @Override
     public void onDestroy() {
+        _dBRepository.RemoveListenerForMonitoredObjects();
         super.onDestroy();
     }
 
@@ -57,10 +48,12 @@ public class MonitorService extends Service {//implements IModelEventListener {
         public void AddMonitoredObject(MonitoredObject obj){ _dBRepository.addMonitoredObject(obj);}
 
         @Override
-        public void SetupMonitoredObjectsListener() { _dBRepository.SetupDbListenerForMonitoredObjects(); }
+        public void SetupRepository(String userId) {
+            if(_dBRepository != null) return;
 
-        @Override
-        public void RemoveMonitoredObjectsListener() { _dBRepository.RemoveListenerForMonitoredObjects(); }
+            _dBRepository = new DatabaseRepository("users/" + userId, MonitorService.this);
+            _dBRepository.SetupDbListenerForMonitoredObjects();
+        }
 
         @Override
         public void SetupPropertiesReadingLister(String id) { _dBRepository.SetupDbListenersForPropertiesForMonitoredObject(id); }
@@ -72,8 +65,7 @@ public class MonitorService extends Service {//implements IModelEventListener {
     public interface OverviewActivityBinder{
         MonitoredObject GetMonitoredObjectFor(String uuid);
         List<MonitoredObject> GetAllMonitoredObjects();
-        void SetupMonitoredObjectsListener();
-        void RemoveMonitoredObjectsListener();
+        void SetupRepository(String userId);
     }
 
     public interface DetailActivityBinder{

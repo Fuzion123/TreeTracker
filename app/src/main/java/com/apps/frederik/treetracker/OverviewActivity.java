@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -24,11 +22,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
-
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private MonitorService.OverviewActivityBinder _binder;
@@ -39,6 +44,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private final String LAST_FRAGMENT_ACTIVE = "com.apps.frederik.treetracker.last.fragment.active";
     private String _currentFragmentTag = FRAGMENT_LIST_TAG; // default behavior
     private ProgressBar loadingAnimation;
+    private String _userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +93,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         InstantiateFragmentByTag(_currentFragmentTag);
 
+        _userId = getIntent().getExtras().getString(Globals.USERID);
         Intent intentService = new Intent(this, MonitorService.class);
-        // TODO add authentication. Should be userId instead of hardcoded user: "Fuzion"
-        intentService.putExtra(Globals.DATABASE_REFERENCE, "Users/Fuzion123");
         bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -108,16 +113,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
         if(_isBoundToService){
-            _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
+            RehreshFragment();
         }
-
-        int visibility = View.VISIBLE;
-        if(_currentFragement != null){
-            if(_currentFragement.GetMonitoredObject().size() > 0){
-                visibility= View.GONE;
-            }
-        }
-        loadingAnimation.setVisibility(visibility);
 
         super.onResume();
     }
@@ -159,6 +156,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (MonitorService.OverviewActivityBinder) binder;
             _isBoundToService = true;
+            _binder.SetupRepository(_userId);
+            RehreshFragment();
         }
 
         @Override
@@ -166,6 +165,19 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             _isBoundToService = false;
         }
     };
+
+    private void RehreshFragment(){
+        _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
+
+        int visibility = View.VISIBLE;
+        if(_currentFragement != null){
+            if(_currentFragement.GetMonitoredObject().size() > 0){
+                visibility= View.GONE;
+            }
+        }
+        loadingAnimation.setVisibility(visibility);
+
+    }
 
     @Override
     public void onBackPressed() {

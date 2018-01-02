@@ -24,13 +24,30 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-import com.apps.frederik.treetracker.Model.Util.Coordinate;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AddMonitoredObjectActivity extends AppCompatActivity {
+
+    // fields to assign a new MonitoredObject
+    // TODO below is hardcoded!!!
+    private String _owner = "christ";
+    private String _assignTo;
+    private double _latitude;
+    private double _longitude;
+    private String _hardware_serial;
+
 
     private MonitorService.AddMonitoredObjectActivityBinder _binder;
     private boolean _isBoundToService;
@@ -117,7 +134,11 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                 }
 
                 if (checkLocationPermission())
-                    FinalizeAddingSensor();
+                    try {
+                        FinalizeAddingSensor();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 else
                     requestLocationPermission();
             }
@@ -162,28 +183,62 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private void FinalizeAddingSensor(){
-        throw new UnsupportedOperationException();
-        /*
+    private void FinalizeAddingSensor() throws JSONException {
+        // return if permissions is not granted!
         if (!checkLocationPermission())
             return;
+
         lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-        double currentLongitude = lastKnownLocation.getLongitude();
-        double currentLatitude = lastKnownLocation.getLatitude();
-        Coordinate gpsCoordinate = new Coordinate(currentLatitude, currentLongitude);
+        _latitude = lastKnownLocation.getLatitude();
+        _longitude = lastKnownLocation.getLongitude();
+        _assignTo = editTextSensorName.getText().toString();
 
-        if(!_isBoundToService) throw new RuntimeException("AddMonitoredObjectActivity: is not bound to service where it should be!");
+        RequestQueue volleyQueue = Volley.newRequestQueue(this);
+        String function = "assign";
+        String url = Globals.TTN_CLOUD_FUNCTIONS_URL + function;
 
+        JSONObject requestBody = createJsonBodyForAssign();
 
-        MonitoredObject obj = new MonitoredObject();
-        obj.setCoordinate(gpsCoordinate);
-        obj.setUniqueDescription(editTextSensorName.getText().toString());
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("volleyreponse", "HTTP Reponse: " + response);
+                        finish();
+                        return;
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error.getMessage().contains("Successfull")){
+                    finish();
+                    return;
+                }
+                else{
+                    Toast.makeText(AddMonitoredObjectActivity.this, "adding the sensor failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+            }
+        });
 
-        _binder.AddMonitoredObject(obj);
+        volleyQueue.add(request);
+    }
 
-        finish();
-        return;
-        */
+    private JSONObject createJsonBodyForAssign() throws JSONException {
+        JSONObject requestBody = new JSONObject();
+        JSONObject location = new JSONObject();
+
+        requestBody.put("owner", _owner);
+        requestBody.put("assignTo", _assignTo);
+
+        location.put("latitude", _latitude);
+        location.put("longtitude", _longitude);
+
+        requestBody.put("location", location);
+        requestBody.put("hardware_serial", _hardware_serial);
+
+        return requestBody;
     }
 
     private boolean checkLocationPermission() {
@@ -228,7 +283,11 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == RC_HANDLE_LOCATION_PERM){
-            FinalizeAddingSensor();
+            try {
+                FinalizeAddingSensor();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (checkLocationPermission())
                 return;
             else {
@@ -261,7 +320,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                     imageViewTree.setVisibility(View.VISIBLE);
                     textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
                     textViewUUIDValue.setText(barcode.displayValue);
-                    uuid = barcode.displayValue;
+                    _hardware_serial = barcode.displayValue;
                     Log.d("ADDNewObject", "Barcode read: " + barcode.displayValue);
                 } else {
                     Log.d("ADDNewObject", "No barcode captured, intent data is null");
