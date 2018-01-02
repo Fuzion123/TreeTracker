@@ -19,16 +19,6 @@ public class PropertiesReading {
         this.TimeStamp = timeStamp;
     }
 
-    /*
-    public boolean equals(Object r){
-        if(r instanceof PropertiesReading){
-            PropertiesReading reading = (PropertiesReading) r;
-            if(reading.getTimeStamp().equals(this.getTimeStamp()) && reading.Data.equals(this.Data)) return true;
-        }
-        return false;
-    }
-    */
-
     public HashMap<String, String> getProperties() {
         return Properties;
     }

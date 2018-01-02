@@ -23,13 +23,15 @@ import com.jjoe64.graphview.series.DataPoint;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity {
     private MonitorService.DetailActivityBinder _binder;
     private boolean _isBoundToService;
     private String UniqueDiscription;
-    private String DetailType;
     private GraphFragment graphFragment;
     private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
     private TextView txtViewCurrent;
@@ -44,7 +46,6 @@ public class DetailActivity extends AppCompatActivity {
         txtViewCurrentDate = findViewById(R.id.textViewCurrentDate);
 
         UniqueDiscription = getIntent().getExtras().getString(Globals.UNIQUE_DESCRIPTION);
-        DetailType = getIntent().getExtras().getString(Globals.DETAIL_TYPE);
 
         Intent service = new Intent(this, MonitorService.class);
         bindService(service,_connection, Context.BIND_AUTO_CREATE);
@@ -124,26 +125,36 @@ public class DetailActivity extends AppCompatActivity {
 
     private void UpdateGraphFragment(Intent intent){
         if(_isBoundToService){
-
             // updating the historical values
             List<PropertiesReading> reads = new ArrayList<>(_binder.GetHistorical());
-            List<DataPoint> data = new ArrayList<>();
+
+            String humidityString = "humidity";
+            String batteryString = "battery";
+
+            Map<String, List<DataPoint>> data = new HashMap<>();
+            data.put(humidityString, new ArrayList<DataPoint>());
+            data.put(batteryString, new ArrayList<DataPoint>());
 
             for (PropertiesReading r : reads)
             {
                 Date time = TimeStampHelper.get_dataTime(r.getTimeStamp());
-                double value = Double.valueOf(r.getProperties().get("humidity"));
-                data.add(new DataPoint(time, value));
+                double humidity = Double.valueOf(r.getProperties().get(humidityString));
+                double battery = Double.valueOf(r.getProperties().get(batteryString));
+
+                data.get(humidityString).add(new DataPoint(time, humidity));
+                data.get(batteryString).add(new DataPoint(time, battery));
             }
+
             graphFragment.AddData(data);
 
             // update the current value
             PropertiesReading current = _binder.GetCurrent();
             SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd. MMM yyyy  hh:mm:ss aa");
             String readableDate = formatter.format(TimeStampHelper.get_dataTime(current.getTimeStamp()));
-            String value = current.getProperties().get("humidity") + "%"; // TODO hardcoded!!
+            String valueHumidity = current.getProperties().get("humidity") + "%";
+            String valueBattery = current.getProperties().get(batteryString) + "%";
 
-            txtViewCurrent.setText(getString(R.string.current)+ " " + DetailType + ": " + value);
+            txtViewCurrent.setText(getString(R.string.current)+ " " + humidityString + ": " + valueHumidity + ", " + batteryString + ": " + valueBattery);
             txtViewCurrentDate.setText(getString(R.string.date) + ": " + readableDate);
         }
         else{

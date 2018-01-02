@@ -215,7 +215,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                     return;
                 }
                 else{
-                    Toast.makeText(AddMonitoredObjectActivity.this, "adding the sensor failed: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
