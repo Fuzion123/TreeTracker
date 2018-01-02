@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,10 +95,8 @@ public class GraphFragment extends Fragment {
         // return if there is no datapoints!
         if(numberOfDataPoints == 0) return;
 
-        float pointSize = _pointsBattery.getSize()/4;
-
-        _pointsBattery.setSize(pointSize);
-        _pointsHumidity.setSize(pointSize);
+        _pointsBattery.setSize(7f);
+        _pointsHumidity.setSize(7f);
 
         // again, just using lineHumidity as example of size.
         double minX = _lineHumidity.getLowestValueX();
