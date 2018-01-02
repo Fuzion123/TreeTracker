@@ -3,6 +3,7 @@ package com.apps.frederik.treetracker;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
@@ -10,11 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.content.Intent;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,9 @@ public class LoginActivity extends AppCompatActivity {
     EditText _passwordText;
     Button _loginButton;
     TextView _signupLink;
+    ImageView _treeImage;
+    AnimationDrawable _treeAnimation;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
         _passwordText = findViewById(R.id.input_password);
         _loginButton = findViewById(R.id.btn_login);
         _signupLink = findViewById(R.id.link_signup);
+        _treeImage = findViewById(R.id.tree_image);
+        _treeImage.setBackgroundResource(R.drawable.tree_flipper);
+        _treeAnimation = (AnimationDrawable) _treeImage.getBackground();
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -74,6 +83,13 @@ public class LoginActivity extends AppCompatActivity {
 
         // inserts email and password if last login was successful.
         SetEmailAndPasswordFromLastTime();
+    }
+
+    @Override
+    public void onWindowFocusChanged (boolean hasFocus)
+    {
+        if (hasFocus)
+            _treeAnimation.start();
     }
 
     public void login() {
@@ -146,14 +162,15 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
-        progressDialog.dismiss();
+        if(progressDialog != null)
+            progressDialog.dismiss();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        progressDialog.dismiss();
+        if(progressDialog != null)
+            progressDialog.dismiss();
     }
 
     public boolean validate() {
@@ -163,14 +180,14 @@ public class LoginActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
+            _emailText.setError("Enter a valid email address");
             valid = false;
         } else {
             _emailText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 ) {
-            _passwordText.setError("password needs to be at least 8 alphanumeric characters");
+            _passwordText.setError("Password needs to be at least 8 alphanumeric characters");
             valid = false;
         } else {
             _passwordText.setError(null);
