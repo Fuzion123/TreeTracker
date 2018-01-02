@@ -1,35 +1,27 @@
 {
   "project_info": {
-    "project_number": "570934151107",
-    "firebase_url": "https://sandbox-653ef.firebaseio.com",
-    "project_id": "sandbox-653ef",
-    "storage_bucket": "sandbox-653ef.appspot.com"
+    "project_number": "784743071461",
+    "firebase_url": "https://treetracker-e85e7.firebaseio.com",
+    "project_id": "treetracker-e85e7",
+    "storage_bucket": "treetracker-e85e7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:570934151107:android:3dba0607b135b22b",
+        "mobilesdk_app_id": "1:784743071461:android:3dba0607b135b22b",
         "android_client_info": {
           "package_name": "com.apps.frederik.treetracker"
         }
       },
       "oauth_client": [
         {
-          "client_id": "570934151107-d2fqlcodouljaa4jjf1706c3mav90vot.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.apps.frederik.treetracker",
-            "certificate_hash": "fa1b9dc0f6e0d5af9d340c0ff7f93dbe62927509"
-          }
-        },
-        {
-          "client_id": "570934151107-2885a1jp2nti25fhnbl4jbgc1jhplmbg.apps.googleusercontent.com",
+          "client_id": "784743071461-4npmu6r7qks4llrc5hqr01mukvho5m4a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDBFKI1MPyo3fBjjizHB_Wea4JUxKdpaMk"
+          "current_key": "AIzaSyBXnz5oGYlU7HTo8nY3pJzZhlrjarmhu3w"
         }
       ],
       "services": {
@@ -37,13 +29,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "570934151107-2885a1jp2nti25fhnbl4jbgc1jhplmbg.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
