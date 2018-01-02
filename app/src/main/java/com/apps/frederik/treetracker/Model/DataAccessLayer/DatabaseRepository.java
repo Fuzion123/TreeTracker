@@ -15,6 +15,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -195,20 +198,34 @@ public class DatabaseRepository {
     };
 
     private PropertiesReading PropertiesReadingFromDataSnapshot(DataSnapshot dataSnapshot){
-        PropertiesReading propsRead = new PropertiesReading();
+        PropertiesReading propsReading = new PropertiesReading();
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
             if (snapshot.getKey().equals("timestamp")) {
                 // uses the phones current timezone to adjust the time. (+1 hour for dk time)
-                TimeZone tz = TimeZone.getTimeZone("UTC");
-                Calendar c = Calendar.getInstance(tz);
-                c.setTime(new Date(snapshot.getValue().toString()));
-                propsRead.setTimeStamp(c.getTime().toString());
+                //Calendar c = Calendar.getInstance();
+                //c.setTime(new Date(snapshot.getValue().toString()));
+
+                String time = snapshot.getValue().toString();
+                String regx = "\\.[0-9]*";
+                time = time.replaceAll(regx, "");
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                Date d = null;
+                try{
+                    d = formatter.parse(time);
+                }catch (ParseException e){
+                    throw new RuntimeException("time could not be parsed be SimpleFormatter");
+                }
+
+                String readableTime = d.toString();
+                propsReading.setTimeStamp(readableTime);
             }
             else{
-                propsRead.getProperties().put(snapshot.getKey(), snapshot.getValue().toString());
+                propsReading.getProperties().put(snapshot.getKey(), snapshot.getValue().toString());
             }
         }
-        return propsRead;
+        return propsReading;
     }
 }
 

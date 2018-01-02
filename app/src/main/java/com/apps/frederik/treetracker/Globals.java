@@ -12,7 +12,6 @@ public final class Globals {
     public static final String UNIQUE_DESCRIPTION = "com.apps.frederik.treetracker.unique.description";
     public static final String DETAIL_TYPE = "com.apps.frederik.treetracker.detail.type";
     public static final String APP_NAME = "TreeTracker";
-    public static final String DATABASE_REFERENCE = "com.apps.frederik.treetracker.database.reference";
-    public static final String TTN_CLOUD_FUNCTIONS_URL = "https://us-central1-sandbox-653ef.cloudfunctions.net/TheThingsNetwork/";
+    public static final String TTN_CLOUD_FUNCTIONS_URL = "https://us-central1-treetracker-e85e7.cloudfunctions.net/TheThingsNetwork/";
     public static final String USERID = "com.apps.frederik.treetracker.user.id";
 }

@@ -34,7 +34,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.google.firebase.database.Exclude;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,11 +42,13 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
 
     // fields to assign a new MonitoredObject
     // TODO below is hardcoded!!!
-    private String _owner = "christ";
+    private String _owner;
     private String _assignTo;
     private double _latitude;
     private double _longitude;
     private String _hardware_serial;
+
+    private RequestQueue volleyQueue;
 
 
     private MonitorService.AddMonitoredObjectActivityBinder _binder;
@@ -75,6 +76,8 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_sensor);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        _owner = getIntent().getExtras().getString(Globals.USERID);
+         volleyQueue = Volley.newRequestQueue(this);
 
         buttonAddSensor = findViewById(R.id.buttonAddSensor);
         editTextSensorName = findViewById(R.id.editTextSensorName);
@@ -194,13 +197,41 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         _longitude = lastKnownLocation.getLongitude();
         _assignTo = editTextSensorName.getText().toString();
 
-        RequestQueue volleyQueue = Volley.newRequestQueue(this);
-        String function = "assign";
-        String url = Globals.TTN_CLOUD_FUNCTIONS_URL + function;
+        volleyQueue.add(createRegisterRequest());
+    }
 
-        JSONObject requestBody = createJsonBodyForAssign();
+    private JsonObjectRequest createRegisterRequest() throws JSONException {
+        String url = Globals.TTN_CLOUD_FUNCTIONS_URL + "register";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, getJsonBodyForRegister(),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        throw new RuntimeException("reponse from http was NOT an error!");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    if (error.getMessage().contains("Successfull")) {
+                        volleyQueue.add(createAssignRequest());
+                    } else {
+                        Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                }catch (Exception e){
+                    Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+            }
+        });
+        return request;
+    }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+    private JsonObjectRequest createAssignRequest() throws JSONException {
+        String url = Globals.TTN_CLOUD_FUNCTIONS_URL + "assign";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, getJsonBodyForAssign(),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -213,6 +244,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 try {
                     if (error.getMessage().contains("Successfull")) {
+                        Toast.makeText(AddMonitoredObjectActivity.this, "TreeTracker: " + _assignTo + " was succesfully added!", Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     } else {
@@ -227,11 +259,10 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                 }
             }
         });
-
-        volleyQueue.add(request);
+        return request;
     }
 
-    private JSONObject createJsonBodyForAssign() throws JSONException {
+    private JSONObject getJsonBodyForAssign() throws JSONException {
         JSONObject requestBody = new JSONObject();
         JSONObject location = new JSONObject();
 
@@ -239,9 +270,18 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         requestBody.put("assignTo", _assignTo);
 
         location.put("latitude", _latitude);
-        location.put("longtitude", _longitude);
+        location.put("longitude", _longitude);
 
         requestBody.put("location", location);
+        requestBody.put("hardware_serial", _hardware_serial);
+
+        return requestBody;
+    }
+
+    private JSONObject getJsonBodyForRegister() throws JSONException {
+        JSONObject requestBody = new JSONObject();
+
+        requestBody.put("owner", _owner);
         requestBody.put("hardware_serial", _hardware_serial);
 
         return requestBody;

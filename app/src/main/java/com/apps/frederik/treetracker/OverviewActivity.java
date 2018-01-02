@@ -8,7 +8,10 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -22,18 +25,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private MonitorService.OverviewActivityBinder _binder;
@@ -45,6 +61,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private String _currentFragmentTag = FRAGMENT_LIST_TAG; // default behavior
     private ProgressBar loadingAnimation;
     private String _userId;
+    private Map<String, String> body = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +69,9 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         setContentView(R.layout.activity_overview);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // retrieving the user id from login activity
+        _userId = getIntent().getExtras().getString(Globals.USERID);
 
         // setting up the loading bar
         loadingAnimation = findViewById(R.id.loadingAnimation);
@@ -64,6 +84,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(OverviewActivity.this, AddMonitoredObjectActivity.class);
+                intent.putExtra(Globals.USERID, _userId);
                 startActivity(intent);
             }
         });
@@ -92,11 +113,10 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         }
 
         InstantiateFragmentByTag(_currentFragmentTag);
-
-        _userId = getIntent().getExtras().getString(Globals.USERID);
         Intent intentService = new Intent(this, MonitorService.class);
         bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
     }
+
 
     @Override
     protected void onDestroy() {
@@ -157,6 +177,31 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             _binder = (MonitorService.OverviewActivityBinder) binder;
             _isBoundToService = true;
             _binder.SetupRepository(_userId);
+
+            final Handler mHandler = new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(Message message) {
+
+                }
+            };
+
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(_binder.GetAllMonitoredObjects().size() == 0){
+                                        Toast.makeText(OverviewActivity.this, "It looks like you have no trackers yet :-(", Toast.LENGTH_LONG).show();
+                                        loadingAnimation.setVisibility(View.GONE);
+                                    }
+                                }
+                            });
+                        }
+                    },5000
+            );
+
             RehreshFragment();
         }
 
@@ -258,7 +303,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     public void onListFragmentInteraction(MonitoredObject item) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(Globals.UNIQUE_DESCRIPTION, item.getUniqueDescription());
-        intent.putExtra(Globals.DETAIL_TYPE, "humidity"); // TODO hardcoded to humidity
         startActivity(intent);
     }
 
