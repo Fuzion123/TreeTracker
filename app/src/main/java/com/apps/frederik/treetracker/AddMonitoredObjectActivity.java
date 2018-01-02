@@ -34,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.database.Exclude;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -210,11 +211,16 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(error.getMessage().contains("Successfull")){
-                    finish();
-                    return;
-                }
-                else{
+                try {
+                    if (error.getMessage().contains("Successfull")) {
+                        finish();
+                        return;
+                    } else {
+                        Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                        finish();
+                        return;
+                    }
+                }catch (Exception e){
                     Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
                     finish();
                     return;
