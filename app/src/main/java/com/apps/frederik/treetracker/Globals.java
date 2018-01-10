@@ -14,4 +14,5 @@ public final class Globals {
     public static final String APP_NAME = "TreeTracker";
     public static final String TTN_CLOUD_FUNCTIONS_URL = "https://us-central1-treetracker-e85e7.cloudfunctions.net/TheThingsNetwork/";
     public static final String USERID = "com.apps.frederik.treetracker.user.id";
+    public static final String EMAIL = "com.apps.frederik.treetracker.email";
 }

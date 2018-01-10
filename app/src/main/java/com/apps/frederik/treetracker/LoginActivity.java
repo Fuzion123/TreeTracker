@@ -73,9 +73,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(LoginActivity.this, "Signing up is not yet implemented! :-)", Toast.LENGTH_LONG).show();
-                // Start the Signup activity
-                //Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                //startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
 
@@ -93,8 +90,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login() {
-        Log.d(TAG, "Login");
-
         if (!validate()) {
             onLoginFailed();
             return;
@@ -102,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
 
         _loginButton.setEnabled(false);
 
-
+        // authenticating progress
         progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme);
         progressDialog.setIndeterminate(true);
@@ -110,9 +105,11 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.getWindow().setGravity(Gravity.CENTER);
         progressDialog.show();
 
+        // reads the user input fields
         final String email = _emailText.getText().toString();
         final String password = _passwordText.getText().toString();
 
+        // checks with firebase database authentication, that the provided user and password is valid.
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -128,19 +125,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
-            }
-        }
-    }
-
     @Override
     public void onBackPressed() {
         // disable going back to the MainActivity
@@ -150,12 +134,12 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
 
+        // starts overview activity
         Intent overview = new Intent(LoginActivity.this, OverviewActivity.class);
         String userId = user.getUid();
         overview.putExtra(Globals.USERID, userId);
+        overview.putExtra(Globals.EMAIL, _emailText.getText().toString());
         startActivity(overview);
-
-
         finish();
     }
 
@@ -187,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (password.isEmpty() || password.length() < 4 ) {
-            _passwordText.setError("Password needs to be at least 8 alphanumeric characters");
+            _passwordText.setError("Password needs to be at least 4 alphanumeric characters");
             valid = false;
         } else {
             _passwordText.setError(null);
@@ -195,6 +179,7 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
+    // using sharedprefs to save username and password of last successful authentication.
     private void SaveEmailAndPassword(){
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
@@ -206,6 +191,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.commit();
     }
 
+    // using sharedprefs to save username and password of last successful authentication.
     private void SetEmailAndPasswordFromLastTime(){
         SharedPreferences pref = getSharedPreferences(SHARED_PREF_LOGIN, MODE_PRIVATE);
         String email = pref.getString(SHARED_PREF_EMAIL, null);

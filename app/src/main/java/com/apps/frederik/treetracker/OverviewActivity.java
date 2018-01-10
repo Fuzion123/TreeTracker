@@ -25,43 +25,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
-    private MonitorService.OverviewActivityBinder _binder;
-    private boolean _isBoundToService;
-    private MonitoredObjectFragment _currentFragement;
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
     private final String FRAGMENT_MAP_TAG = "com.apps.frederik.treetracker.mapFragment";
     private final String LAST_FRAGMENT_ACTIVE = "com.apps.frederik.treetracker.last.fragment.active";
+    private MonitorService.OverviewActivityBinder _binder;
+    private boolean _isBoundToService;
+    private MonitoredObjectFragment _currentFragement;
     private String _currentFragmentTag = FRAGMENT_LIST_TAG; // default behavior
-    private ProgressBar loadingAnimation;
+    private ProgressBar _loadingAnimation;
     private String _userId;
-    private Map<String, String> body = new HashMap<>();
+    private TextView _txtViewUserId;
+    private String _userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +56,18 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // retrieving the user id from login activity
+        // retrieving the user id and email from login activity
         _userId = getIntent().getExtras().getString(Globals.USERID);
+        _userEmail = getIntent().getExtras().getString(Globals.EMAIL);
 
-        // setting up the loading bar
-        loadingAnimation = findViewById(R.id.loadingAnimation);
-        Drawable progressDrawable = loadingAnimation.getIndeterminateDrawable().mutate();
+        // setting up the loading bar color to the theme (colorPrimary)
+        // inspired from: https://stackoverflow.com/questions/2020882/how-to-change-progress-bars-progress-color-in-android
+        _loadingAnimation = findViewById(R.id.loadingAnimation);
+        Drawable progressDrawable = _loadingAnimation.getIndeterminateDrawable().mutate();
         progressDrawable.setColorFilter(getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
-        loadingAnimation.setIndeterminateDrawable(progressDrawable);
+        _loadingAnimation.setIndeterminateDrawable(progressDrawable);
 
+        // setting up the add new monitor FAB button
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,16 +78,21 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
+        // setting up the navigation bar
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Using the navigationView, the header is not instantly added, which mean
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_overview);
+        _txtViewUserId = headerLayout.findViewById(R.id.textViewUserId);
+        _txtViewUserId.setText(_userEmail);
 
+        // on orientation the state of which
         if(savedInstanceState != null) {
             _currentFragmentTag = savedInstanceState.getString(LAST_FRAGMENT_ACTIVE);
 
@@ -154,7 +148,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
             String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
-            loadingAnimation.setVisibility(View.GONE);
+            _loadingAnimation.setVisibility(View.GONE);
         }
     };
 
@@ -194,7 +188,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                                 public void run() {
                                     if(_binder.GetAllMonitoredObjects().size() == 0){
                                         Toast.makeText(OverviewActivity.this, "It looks like you have no trackers yet :-(", Toast.LENGTH_LONG).show();
-                                        loadingAnimation.setVisibility(View.GONE);
+                                        _loadingAnimation.setVisibility(View.GONE);
                                     }
                                 }
                             });
@@ -220,7 +214,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                 visibility= View.GONE;
             }
         }
-        loadingAnimation.setVisibility(visibility);
+        _loadingAnimation.setVisibility(visibility);
 
     }
 
