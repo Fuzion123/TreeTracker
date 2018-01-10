@@ -107,6 +107,7 @@
         android:layout_height="179dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:contentDescription="@string/content_description_tree"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

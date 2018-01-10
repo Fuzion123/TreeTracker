@@ -1,4 +1,8 @@
 <resources>
+    <!-- Fixed Render problem in activity_login.xml: https://stackoverflow.com/questions/41303347/couldnt-resolve-resource-id-visible-when-using-textinputlayout -->
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+
     <string name="app_name">Tree Tracker</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

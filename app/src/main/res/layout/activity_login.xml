@@ -23,7 +23,8 @@
             android:layout_marginBottom="24dp"
             android:contentDescription="@string/content_description_tree"
             android:src="@drawable/tree"
-            android:visibility="visible" />
+            android:visibility="visible"
+            />
 
 
 
