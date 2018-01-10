@@ -27,6 +27,7 @@ import java.util.Map;
 public class DetailActivity extends AppCompatActivity {
     private final String NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE = "Detail Activity was not bound to service, in a time where is should!";
     private final String DATE_FORMAT_PATTERN = "EEE, dd. MMM yyyy  hh:mm:ss aa";
+    private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
     private MonitorService.DetailActivityBinder _binder;
     private boolean _isBoundToService;
     private String UniqueDescription;
