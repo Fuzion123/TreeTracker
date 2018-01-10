@@ -8,13 +8,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,9 +28,6 @@ import com.apps.frederik.treetracker.Fragments.ListFragment;
 import com.apps.frederik.treetracker.Fragments.MapFragment;
 import com.apps.frederik.treetracker.Fragments.MonitoredObjectFragment;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class OverviewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ListFragment.OnListFragmentInteractionListener {
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
@@ -106,6 +99,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
             navigationView.setCheckedItem(R.id.nav_listFragment);
         }
 
+        // service created as a bound service. Meaning it will stop when no activity is bound to it.
         InstantiateFragmentByTag(_currentFragmentTag);
         Intent intentService = new Intent(this, MonitorService.class);
         bindService(intentService, _connection, Context.BIND_AUTO_CREATE);
@@ -122,12 +116,11 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     protected void onResume() {
-        Log.d("OverviewActivity", "onResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_MONITORED_OBJECT_ADDED));
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
         if(_isBoundToService){
-            RehreshFragment();
+            RefreshFragment();
         }
 
         super.onResume();
@@ -148,6 +141,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
             String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
+
+            // when a monitoredObject is first added, the loading progress bar shall not be shown anymore.
             _loadingAnimation.setVisibility(View.GONE);
         }
     };
@@ -167,36 +162,15 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
             _binder = (MonitorService.OverviewActivityBinder) binder;
             _isBoundToService = true;
             _binder.SetupRepository(_userId);
 
-            final Handler mHandler = new Handler(Looper.getMainLooper()) {
-                @Override
-                public void handleMessage(Message message) {
+            // starts a timer that ends the loading animation after the timer fires, and makes a toast.
+            StartLoadingAnimationStopTimer();
 
-                }
-            };
-
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(_binder.GetAllMonitoredObjects().size() == 0){
-                                        Toast.makeText(OverviewActivity.this, "It looks like you have no trackers yet :-(", Toast.LENGTH_LONG).show();
-                                        _loadingAnimation.setVisibility(View.GONE);
-                                    }
-                                }
-                            });
-                        }
-                    },5000
-            );
-
-            RehreshFragment();
+            // refreshes the ui for the current fragment
+            RefreshFragment();
         }
 
         @Override
@@ -205,7 +179,29 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         }
     };
 
-    private void RehreshFragment(){
+    // timer that stops the loading animation after 5000ms and displays toast.
+    private void StartLoadingAnimationStopTimer(){
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // if no monitored object has still been recieved from the database after 5000ms. We assume there is not added yet.
+                                if(_binder.GetAllMonitoredObjects().size() == 0){
+                                    Toast.makeText(OverviewActivity.this, "It looks like you have no trackers yet :-(", Toast.LENGTH_LONG).show();
+                                    _loadingAnimation.setVisibility(View.GONE);
+                                }
+                            }
+                        });
+                    }
+                },5000 // delay in ms.
+        );
+    }
+
+    // refreshes the UI of the fragments in the overview.
+    private void RefreshFragment(){
         _currentFragement.RefreshAllMonitoredObject(_binder.GetAllMonitoredObjects());
 
         int visibility = View.VISIBLE;
@@ -271,7 +267,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         item.setChecked(true);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-
         return true;
     }
 
