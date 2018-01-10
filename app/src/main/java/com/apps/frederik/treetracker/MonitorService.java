@@ -10,7 +10,7 @@ import com.apps.frederik.treetracker.Model.PropertiesReading.PropertiesReading;
 
 import java.util.List;
 
-public class MonitorService extends Service {//implements IModelEventListener {
+public class MonitorService extends Service {
     private IBinder _sensorBinder = new MonitorServiceBinder();
     private DatabaseRepository _dBRepository = null;
 
@@ -62,6 +62,7 @@ public class MonitorService extends Service {//implements IModelEventListener {
         public void RemovePropertiesReadingListener(String id) { _dBRepository.RemoveListenerForPropertiesForMonitoredObject(id); }
     }
 
+    // below defines three different interfaces that is used by the three different Activities (Overview, Detailed and AddSensor)
     public interface OverviewActivityBinder{
         MonitoredObject GetMonitoredObjectFor(String uuid);
         List<MonitoredObject> GetAllMonitoredObjects();

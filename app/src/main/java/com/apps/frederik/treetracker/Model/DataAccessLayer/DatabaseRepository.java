@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -91,11 +92,6 @@ public class DatabaseRepository {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             String description = dataSnapshot.getKey();
-
-            // if != null, it means it already is received.
-            //if(GetMonitoredObjectFor(description) != null) return;
-
-
             MonitoredObject obj = new MonitoredObject();
 
             // sets the description of the
@@ -105,8 +101,8 @@ public class DatabaseRepository {
             obj.setCoordinate(dataSnapshot.child("coordinate").getValue(Coordinate.class));
 
             // deserialize the monitored properties
-            DataSnapshot snapshot = dataSnapshot.child("properties").child("current");
-            obj.setCurrent(PropertiesReadingFromDataSnapshot(snapshot));
+            // DataSnapshot snapshot = dataSnapshot.child("properties").child("current");
+            // obj.setCurrent(PropertiesReadingFromDataSnapshot(snapshot));
 
             // finally adds the monitored object.
             _objects.add(obj);
@@ -145,24 +141,24 @@ public class DatabaseRepository {
 
             _detailedMonitoredObject.setUniqueDescription(id);
 
-            if(key.equals("current")){
-                PropertiesReading current = PropertiesReadingFromDataSnapshot(dataSnapshot);
-                _detailedMonitoredObject.setCurrent(current);
-            }
-            // else it is for "historical"
-            else{
-
+            if(key.equals("historical")){
                 _detailedMonitoredObject.setHistorical(new ArrayList<PropertiesReading>());
 
-                int cnt = 0;
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    _detailedMonitoredObject.getHistorical().add(PropertiesReadingFromDataSnapshot(snapshot));
+                Iterator<DataSnapshot> it = dataSnapshot.getChildren().iterator();
+
+                // sets historical readings
+                PropertiesReading current = null; // used to set the current by using the last value of the historical
+                while(it.hasNext()){
+                    DataSnapshot snapshot = it.next();
+                    current = PropertiesReadingFromDataSnapshot(snapshot);
+                    _detailedMonitoredObject.getHistorical().add(current);
                 }
-                Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
+                // sets current reading.
+                _detailedMonitoredObject.setCurrent(current);
+
                 // notifies listeners that a new reading has been captured
+                Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
                 LocalBroadcastManager.getInstance(_context).sendBroadcast(broadcast);
-                cnt++;
-                Log.d("test", "cnt: " + cnt);
             }
         }
 
@@ -170,10 +166,16 @@ public class DatabaseRepository {
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             String key = dataSnapshot.getKey();
 
-            if(key.equals("current")){
-                PropertiesReading read = PropertiesReadingFromDataSnapshot(dataSnapshot);
-                _detailedMonitoredObject.setCurrent(read);
-                _detailedMonitoredObject.getHistorical().add(read);
+            if(key.equals("historical")){
+                Iterator<DataSnapshot> it = dataSnapshot.getChildren().iterator();
+                PropertiesReading current = null; // used to set current value after the while loop.
+                while(it.hasNext()){
+                    DataSnapshot snapshot = it.next();
+                    current = PropertiesReadingFromDataSnapshot(snapshot);
+            }
+
+                _detailedMonitoredObject.setCurrent(current); // sets the current
+                _detailedMonitoredObject.getHistorical().add(current); // adds to historical
 
                 // notifies listeners that a new reading has been captured
                 Intent broadcast = new Intent(Globals.LOCAL_BROADCAST_NEW_READING);
@@ -199,33 +201,34 @@ public class DatabaseRepository {
 
     private PropertiesReading PropertiesReadingFromDataSnapshot(DataSnapshot dataSnapshot){
         PropertiesReading propsReading = new PropertiesReading();
+
+        // sets the timestamp
+        String time = convertTime(dataSnapshot.getKey());
+        propsReading.setTimeStamp(time);
+
+        // adds all properties (humidity and battery)
         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            if (snapshot.getKey().equals("timestamp")) {
-                // uses the phones current timezone to adjust the time. (+1 hour for dk time)
-                //Calendar c = Calendar.getInstance();
-                //c.setTime(new Date(snapshot.getValue().toString()));
-
-                String time = snapshot.getValue().toString();
-                String regx = "\\.[0-9]*";
-                time = time.replaceAll(regx, "");
-                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
-                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                Date d = null;
-                try{
-                    d = formatter.parse(time);
-                }catch (ParseException e){
-                    throw new RuntimeException("time could not be parsed be SimpleFormatter");
-                }
-
-                String readableTime = d.toString();
-                propsReading.setTimeStamp(readableTime);
-            }
-            else{
-                propsReading.getProperties().put(snapshot.getKey(), snapshot.getValue().toString());
-            }
+            propsReading.getProperties().put(snapshot.getKey(), snapshot.getValue().toString());
         }
+
         return propsReading;
+    }
+
+    private String convertTime(String time){
+        String regx = "\\.[0-9]*";
+        time = time.replaceAll(regx, "");
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        Date d = null;
+        try{
+            d = formatter.parse(time);
+        }catch (ParseException e){
+            throw new RuntimeException("time could not be parsed be SimpleFormatter");
+        }
+
+        String readableTime = d.toString();
+        return readableTime;
     }
 }
 

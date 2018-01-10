@@ -31,10 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 // some of this fragment is copied from: https://stackoverflow.com/questions/19353255/how-to-put-google-maps-v2-on-a-fragment-using-viewpager
-
 public class MapFragment extends MonitoredObjectFragment {
     private MapView _mapView;
-    private GoogleMap _googleMap = null;
+    private GoogleMap _googleMap;
     private List<MonitoredObject> _objects = new ArrayList<>();
     private List<Marker> _markers = new ArrayList<>();
     private CameraPosition _camPosition;
@@ -43,14 +42,11 @@ public class MapFragment extends MonitoredObjectFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
         _mapView = (MapView) rootView.findViewById(R.id.mapView);
-
         _mapView.onCreate(savedInstanceState);
         _mapView.onResume();
 
-        setRetainInstance(true); // saves complex objects on orientation rotation
-
+        setRetainInstance(true); // saves complex objects on orientation rotation.
 
         try{
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -66,8 +62,11 @@ public class MapFragment extends MonitoredObjectFragment {
                     AddMarker(obj);
                 }
 
+                // sets the zoom on the google map depending on the added monitored objects and how far from each other they are.
                 SetMapZoom();
 
+                // initialized onClick listener for the marker's text.
+                // this starts the same detailed activity as the listView fragment.
                 _googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
                     public void onInfoWindowClick(Marker marker) {
@@ -78,7 +77,6 @@ public class MapFragment extends MonitoredObjectFragment {
                                 String uuid = _objects.get(i).getUniqueDescription();
                                 Intent detail = new Intent(getContext(), DetailActivity.class);
                                 detail.putExtra(Globals.UNIQUE_DESCRIPTION, uuid);
-                                detail.putExtra(Globals.DETAIL_TYPE, "humidity"); // TODO hardcoded to humidity type
                                 startActivity(detail);
                             }
                         }
@@ -122,18 +120,17 @@ public class MapFragment extends MonitoredObjectFragment {
                     .position(latLng)
                     .anchor(0.5f,0.5f)
                     .title(obj.getUniqueDescription())
-                    .snippet("go to details...")
+                    .snippet(getResources().getString(R.string.getDetailedInfo))
                     .draggable(false)
-                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage("tree")))); // TODO as of now, no meta data specifying type is implemented and tree is always used.
-
+                    .icon(BitmapDescriptorFactory.fromBitmap(findMarkerImage("tree")))); // TODO as of now, no meta data specifying type is implemented and "tree" is always used.
+            // adds markers to list
             _markers.add(m);
-
-
         }
     }
 
+    // gets the bitmap to be shown in the google map
     private Bitmap findMarkerImage(String type){
-        // to make image smaller
+        // sizes defined to make image smaller
         int height = 100;
         int width = 80;
         BitmapDrawable bitmapdraw;
@@ -149,7 +146,7 @@ public class MapFragment extends MonitoredObjectFragment {
             }
         }
         Bitmap bitmap = bitmapdraw.getBitmap();
-        return Bitmap.createScaledBitmap(bitmap,width, height, false);
+        return Bitmap.createScaledBitmap(bitmap,width, height, false); // scales the image.
     }
 
     // inspired by: https://stackoverflow.com/questions/14828217/android-map-v2-zoom-to-show-all-the-markers
@@ -186,10 +183,7 @@ public class MapFragment extends MonitoredObjectFragment {
             cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         }
         _googleMap.moveCamera(cameraUpdate);
-
     }
-
-
 
     @Override
     public void onResume() {

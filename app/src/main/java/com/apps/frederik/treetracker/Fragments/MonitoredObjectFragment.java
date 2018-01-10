@@ -8,7 +8,7 @@ import java.util.List;
  * Created by frede on 20/12/2017.
  */
 
-// This base class is used solely for the overview Activity to treat both the ListFragment and the MapFragment equally.
+// This base class is used solely for the overview Activity to treat both the ListFragment and the MapFragment equally, and have a CurrentFragment variable that fits them both.
 public class MonitoredObjectFragment extends Fragment implements IMonitoredObjectDataUpdater {
     @Override
     public void AddMonitoredObject(MonitoredObject obj) {

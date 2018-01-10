@@ -33,11 +33,18 @@
     <string name="text_treetracker">TreeTracker</string>
     <string name="text_sensor_content">content</string>
 
+    <!-- mapfragment -->
+    <string name="getDetailedInfo">go to details...</string>
 
-    <!-- DetailOverview -->
+
+    <!-- DetailOverview and graph -->
     <string name="current">Current</string>
     <string name="date">Date</string>
     <string name="title_activity_login">Login to start TreeTracking</string>
+    <string name="humidity">Humidity</string>
+    <string name="battery">Battery</string>
+    <string name="historicalData">Historical Data</string>
+    <string name="time">Time</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

@@ -270,7 +270,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         return true;
     }
 
-
+    // initiates fragment
     private void InstantiateFragmentByTag(String fragmentTag){
         if(fragmentTag.equals(FRAGMENT_LIST_TAG)){
             _currentFragement = new ListFragment();
@@ -295,6 +295,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
         startActivity(intent);
     }
 
+    // saves what fragment was currently in use (list or map)
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
