@@ -204,5 +204,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // hides Keyboard ;
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        _loginButton.setFocusableInTouchMode(true);
+        _loginButton.requestFocus();
     }
 }

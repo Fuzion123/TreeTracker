@@ -23,7 +23,8 @@
             android:layout_marginBottom="24dp"
             android:contentDescription="@string/content_description_tree"
             android:src="@drawable/tree"
-            android:visibility="visible" />
+            android:visibility="visible"
+            />
 
 
 
@@ -62,7 +63,8 @@
             android:padding="12dp"
             android:text="@string/btn_login"
             android:focusable="true"
-            android:background="@color/colorPrimary"/>
+            android:background="@color/colorPrimary"
+            android:focusableInTouchMode="true"/>
 
         <TextView
             android:id="@+id/link_signup"
