@@ -40,8 +40,22 @@ import org.json.JSONObject;
 
 public class AddMonitoredObjectActivity extends AppCompatActivity {
 
+    private final String UUID_VALUE_KEY = "UUID_VALUE";
+    private final String ENTER_NAME_HINT = "Enter a name, please";
+    private static final int RC_BARCODE_CAPTURE = 1234;
+    private static final int RC_HANDLE_LOCATION_PERM = 4321;
+    private final String ADD_SENSOR_FAIL_HINT = "Adding the sensor package failed!";
+    private final String MESSAGE_RESPONSE_SUCCESSFULL = "Successfull";
+    private final String NON_ERROR_HTTP_RESPONSE_EXCEPTION_MESSAGE = "Response from HTTP was NOT an error!";
+    private final String MISSING_BARCODE = "No barcode captured, intent data is null";
+    private final String REQUEST_BODY_OWNER = "owner";
+    private final String REQUEST_BODY_ASSIGNTO = "assignTo";
+    private final String REQUEST_BODY_LOCATION = "location";
+    private final String REQUEST_BODY_HARDWARE_SERIAL = "hardware_serial";
+    private final String LOCATION_LATITUDE = "latitude";
+    private final String LOCATION_LONGITUDE = "longitude";
+
     // fields to assign a new MonitoredObject
-    // TODO below is hardcoded!!!
     private String _owner;
     private String _assignTo;
     private double _latitude;
@@ -50,20 +64,13 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
 
     private RequestQueue volleyQueue;
 
-
-    private MonitorService.AddMonitoredObjectActivityBinder _binder;
     private boolean _isBoundToService;
-    private static final int RC_BARCODE_CAPTURE = 1234;
-    private static final int RC_HANDLE_LOCATION_PERM = 4321;
-    private static final String TAG = "AddMonitoredObjectActivity";
 
     private Button buttonAddSensor;
     private EditText editTextSensorName;
     private TextView textViewInformationToUser, textViewUUIDKey, textViewUUIDValue, textViewLocationPermission;
     private ImageView imageViewTree;
     private ImageButton imageButton;
-
-    private String uuid = "";
 
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
@@ -90,8 +97,9 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
+        //Setup UI based on saved instance state in a rather messy way
         if (savedInstanceState != null) {
-            if (savedInstanceState.getString("UUID_VALUE").length() == 0) {
+            if (savedInstanceState.getString(UUID_VALUE_KEY).length() == 0) {
                 imageButton.setVisibility(View.VISIBLE);
                 buttonAddSensor.setVisibility(View.INVISIBLE);
                 editTextSensorName.setVisibility(View.INVISIBLE);
@@ -103,7 +111,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
             else{
                 imageButton.setVisibility(View.INVISIBLE);
                 textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
-                textViewUUIDValue.setText(savedInstanceState.getString("UUID_VALUE"));
+                textViewUUIDValue.setText(savedInstanceState.getString(UUID_VALUE_KEY));
             }
         }
         else{
@@ -128,12 +136,10 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Use helper class to add sensor to Firebase
-
                 //If succesfully added to Firebase, return to OverviewActivity
-                //TODO: Add a proper (null?) check
                 if (invalidSensorName())
                 {
-                    Toast.makeText(AddMonitoredObjectActivity.this, "Enter a name, please", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddMonitoredObjectActivity.this, ENTER_NAME_HINT, Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -157,7 +163,6 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder binder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            _binder = (MonitorService.AddMonitoredObjectActivityBinder) binder;
             _isBoundToService = true;
         }
 
@@ -181,12 +186,15 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    //Save UUID value if already captured from barcode activity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("UUID_VALUE", textViewUUIDValue.getText().toString());
+        outState.putString(UUID_VALUE_KEY, textViewUUIDValue.getText().toString());
         super.onSaveInstanceState(outState);
     }
 
+    //Fetch last known location when adding sensor and make request using volley.
+    //Location and sensor name will be added in the body of the volley request.
     private void FinalizeAddingSensor() throws JSONException {
         // return if permissions is not granted!
         if (!checkLocationPermission())
@@ -200,27 +208,32 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         volleyQueue.add(createRegisterRequest());
     }
 
+    //We are making a JSON Object request, but receive a JSON string from the database.
+    //Since the method expects a JSON Object response, a work-around has been made:
+    //We know that what we receive is a string, which results in an error response, therefore
+    //an ErrorListener is constructed, that checks if the response is successful.
+    //Similar approach for the AssignRequest, which is called on a successful response.
     private JsonObjectRequest createRegisterRequest() throws JSONException {
         String url = Globals.TTN_CLOUD_FUNCTIONS_URL + "register";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, getJsonBodyForRegister(),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        throw new RuntimeException("reponse from http was NOT an error!");
+                        throw new RuntimeException(NON_ERROR_HTTP_RESPONSE_EXCEPTION_MESSAGE);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 try {
-                    if (error.getMessage().contains("Successfull")) {
+                    if (error.getMessage().contains(MESSAGE_RESPONSE_SUCCESSFULL)) {
                         volleyQueue.add(createAssignRequest());
                     } else {
-                        Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AddMonitoredObjectActivity.this, ADD_SENSOR_FAIL_HINT, Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     }
                 }catch (Exception e){
-                    Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddMonitoredObjectActivity.this, ADD_SENSOR_FAIL_HINT, Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
@@ -235,25 +248,23 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("volleyreponse", "HTTP Reponse: " + response);
-                        finish();
-                        return;
+                        throw new RuntimeException(NON_ERROR_HTTP_RESPONSE_EXCEPTION_MESSAGE);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 try {
-                    if (error.getMessage().contains("Successfull")) {
+                    if (error.getMessage().contains(MESSAGE_RESPONSE_SUCCESSFULL)) {
                         Toast.makeText(AddMonitoredObjectActivity.this, "TreeTracker: " + _assignTo + " was succesfully added!", Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     } else {
-                        Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AddMonitoredObjectActivity.this, ADD_SENSOR_FAIL_HINT, Toast.LENGTH_LONG).show();
                         finish();
                         return;
                     }
                 }catch (Exception e){
-                    Toast.makeText(AddMonitoredObjectActivity.this, "Adding the sensor package: " + uuid + " failed!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddMonitoredObjectActivity.this, ADD_SENSOR_FAIL_HINT, Toast.LENGTH_LONG).show();
                     finish();
                     return;
                 }
@@ -262,31 +273,34 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         return request;
     }
 
+    //Construct JSON Object body for assigning a new sensor to firebase.
     private JSONObject getJsonBodyForAssign() throws JSONException {
         JSONObject requestBody = new JSONObject();
         JSONObject location = new JSONObject();
 
-        requestBody.put("owner", _owner);
-        requestBody.put("assignTo", _assignTo);
+        requestBody.put(REQUEST_BODY_OWNER, _owner);
+        requestBody.put(REQUEST_BODY_ASSIGNTO, _assignTo);
 
-        location.put("latitude", _latitude);
-        location.put("longitude", _longitude);
+        location.put(LOCATION_LATITUDE, _latitude);
+        location.put(LOCATION_LONGITUDE, _longitude);
 
-        requestBody.put("location", location);
-        requestBody.put("hardware_serial", _hardware_serial);
+        requestBody.put(REQUEST_BODY_LOCATION, location);
+        requestBody.put(REQUEST_BODY_HARDWARE_SERIAL, _hardware_serial);
 
         return requestBody;
     }
 
+    //Construct JSON Object body for registering a new sensor to firebase.
     private JSONObject getJsonBodyForRegister() throws JSONException {
         JSONObject requestBody = new JSONObject();
 
-        requestBody.put("owner", _owner);
-        requestBody.put("hardware_serial", _hardware_serial);
+        requestBody.put(REQUEST_BODY_OWNER, _owner);
+        requestBody.put(REQUEST_BODY_HARDWARE_SERIAL, _hardware_serial);
 
         return requestBody;
     }
 
+    //If user has granted permissions, fetch location.
     private boolean checkLocationPermission() {
         //Check if location permission is granted
         int rc = ActivityCompat.checkSelfPermission(AddMonitoredObjectActivity.this, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -316,9 +330,8 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         }
     };
 
+    //Request user permission to use location data
     private void requestLocationPermission() {
-        Log.w("ADDNewObject", "Location permission is not granted. Requesting permission");
-
         final Activity thisActivity = AddMonitoredObjectActivity.this;
         final String[] permissions = new String[]
                 {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -326,6 +339,7 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_LOCATION_PERM);
     }
 
+    //Handle location request callback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == RC_HANDLE_LOCATION_PERM){
@@ -346,11 +360,13 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
         }
     }
 
+    //Validate sensor name
     private boolean invalidSensorName() {
         String Name = editTextSensorName.getText().toString();
         return Name.isEmpty() && Name.matches("");
     }
 
+    //Update UI when returning from Barcode Capture based on activity result.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RC_BARCODE_CAPTURE) {
@@ -367,9 +383,8 @@ public class AddMonitoredObjectActivity extends AppCompatActivity {
                     textViewInformationToUser.setText(R.string.text_give_sensor_a_name);
                     textViewUUIDValue.setText(barcode.displayValue);
                     _hardware_serial = barcode.displayValue;
-                    Log.d("ADDNewObject", "Barcode read: " + barcode.displayValue);
                 } else {
-                    Log.d("ADDNewObject", "No barcode captured, intent data is null");
+                    Toast.makeText(AddMonitoredObjectActivity.this, MISSING_BARCODE, Toast.LENGTH_LONG).show();
                 }
             }
         }

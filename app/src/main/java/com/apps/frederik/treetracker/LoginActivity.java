@@ -1,20 +1,15 @@
 package com.apps.frederik.treetracker;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.content.Intent;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,8 +24,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 // this activity and its layout is almost directly copied from: https://sourcey.com/beautiful-android-login-and-signup-screens-with-material-design/
 public class LoginActivity extends AppCompatActivity {
-    private static final String TAG = "LoginActivity";
-    private static final int REQUEST_SIGNUP = 0;
+    private final String SIGN_UP_NOT_IMPLEMENTED_MESSAGE = "Signing up is not yet implemented! :-)";
+    private final String AUTHENTICATING_MESSAGE = "Authenticating...";
+    private final String LOGIN_FAILED_MESSAGE = "Login failed";
+    private final String EMAIL_ERROR_MESSAGE = "Enter a valid email address";
+    private final String PASSWORD_ERROR_MESSAGE = "Password needs to be at least 4 alphanumeric characters";
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private ProgressDialog progressDialog;
@@ -72,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Signing up is not yet implemented! :-)", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, SIGN_UP_NOT_IMPLEMENTED_MESSAGE, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -82,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         SetEmailAndPasswordFromLastTime();
     }
 
+    //Used to run tree animation
     @Override
     public void onWindowFocusChanged (boolean hasFocus)
     {
@@ -101,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
+        progressDialog.setMessage(AUTHENTICATING_MESSAGE);
         progressDialog.getWindow().setGravity(Gravity.CENTER);
         progressDialog.show();
 
@@ -110,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
         final String password = _passwordText.getText().toString();
 
         // checks with firebase database authentication, that the provided user and password is valid.
+        // for unknown reasons, this crashes when run in the emulator.
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), LOGIN_FAILED_MESSAGE, Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
         if(progressDialog != null)
             progressDialog.dismiss();
@@ -157,6 +157,7 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog.dismiss();
     }
 
+    //Validate input credentials and setup corresponding error messages.
     public boolean validate() {
         boolean valid = true;
 
@@ -164,14 +165,14 @@ public class LoginActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("Enter a valid email address");
+            _emailText.setError(EMAIL_ERROR_MESSAGE);
             valid = false;
         } else {
             _emailText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 ) {
-            _passwordText.setError("Password needs to be at least 4 alphanumeric characters");
+            _passwordText.setError(PASSWORD_ERROR_MESSAGE);
             valid = false;
         } else {
             _passwordText.setError(null);

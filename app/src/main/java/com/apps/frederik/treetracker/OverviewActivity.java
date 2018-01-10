@@ -14,7 +14,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -40,6 +39,8 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private final String FRAGMENT_LIST_TAG = "com.apps.frederik.treetracker.listFragment";
     private final String FRAGMENT_MAP_TAG = "com.apps.frederik.treetracker.mapFragment";
     private final String LAST_FRAGMENT_ACTIVE = "com.apps.frederik.treetracker.last.fragment.active";
+    private final String NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE = "Overview Activity was not bound to service, in a time where is should!";
+
     private MonitorService.OverviewActivityBinder _binder;
     private boolean _isBoundToService;
     private MonitoredObjectFragment _currentFragement;
@@ -122,7 +123,6 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     protected void onResume() {
-        Log.d("OverviewActivity", "onResume");
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectAddedReceiver, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_MONITORED_OBJECT_ADDED));
         LocalBroadcastManager.getInstance(this).registerReceiver(onMonitoredObjectRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_MONITORED_OBJECT_REWMOVED));
 
@@ -144,7 +144,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver onMonitoredObjectAddedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+            if(!_isBoundToService) throw new RuntimeException(NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE);
 
             String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.AddMonitoredObject(_binder.GetMonitoredObjectFor(uuid));
@@ -155,13 +155,14 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver onMonitoredObjectRemoved = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!_isBoundToService) throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+            if(!_isBoundToService) throw new RuntimeException(NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE);
 
             String uuid = intent.getExtras().getString(Globals.UNIQUE_DESCRIPTION);
             _currentFragement.RemoveMonitoredObjectFor(uuid);
         }
     };
 
+    private final String NO_TRACKERS_MESSAGE = "It looks like you have no trackers yet :-(";
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection _connection = new ServiceConnection() {
 
@@ -187,7 +188,7 @@ public class OverviewActivity extends AppCompatActivity implements NavigationVie
                                 @Override
                                 public void run() {
                                     if(_binder.GetAllMonitoredObjects().size() == 0){
-                                        Toast.makeText(OverviewActivity.this, "It looks like you have no trackers yet :-(", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(OverviewActivity.this, NO_TRACKERS_MESSAGE, Toast.LENGTH_LONG).show();
                                         _loadingAnimation.setVisibility(View.GONE);
                                     }
                                 }

@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.apps.frederik.treetracker.Fragments.GraphFragment;
@@ -26,10 +25,11 @@ import java.util.List;
 import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity {
-    private final String GRAPH_FRAGMENT_TAG = "com.apps.frederik.treetracker.graph.fragment.tag";
+    private final String NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE = "Detail Activity was not bound to service, in a time where is should!";
+    private final String DATE_FORMAT_PATTERN = "EEE, dd. MMM yyyy  hh:mm:ss aa";
     private MonitorService.DetailActivityBinder _binder;
     private boolean _isBoundToService;
-    private String UniqueDiscription;
+    private String UniqueDescription;
     private GraphFragment graphFragment;
     private TextView txtViewCurrent;
     private TextView txtViewCurrentDate;
@@ -44,8 +44,7 @@ public class DetailActivity extends AppCompatActivity {
         txtViewCurrent = findViewById(R.id.textViewCurrent);
         txtViewCurrentDate = findViewById(R.id.textViewCurrentDate);
 
-        // gets the unique description
-        UniqueDiscription = getIntent().getExtras().getString(Globals.UNIQUE_DESCRIPTION);
+        UniqueDescription = getIntent().getExtras().getString(Globals.UNIQUE_DESCRIPTION);
 
         // starts bound service
         Intent service = new Intent(this, MonitorService.class);
@@ -54,7 +53,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void InitializeFragment(){
         // sets up the listener for properties for the specified UniqueDiscription.
-        _binder.SetupPropertiesReadingLister(UniqueDiscription);
+        _binder.SetupPropertiesReadingLister(UniqueDescription);
 
 
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentByTag(GRAPH_FRAGMENT_TAG);
@@ -84,28 +83,27 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d("OverviewActivity", "onResume");
-        LocalBroadcastManager.getInstance(this).registerReceiver(onNewReadingAdded, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
-        LocalBroadcastManager.getInstance(this).registerReceiver(onReaddingRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_READING_REMOVED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onReadingAdded, new IntentFilter(Globals.LOCAL_BROADCAST_NEW_READING));
+        LocalBroadcastManager.getInstance(this).registerReceiver(onReadingRemoved, new IntentFilter(Globals.LOCAL_BROADCAST_READING_REMOVED));
 
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onNewReadingAdded);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReaddingRemoved);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReadingAdded);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(onReadingRemoved);
         super.onPause();
     }
 
-    private BroadcastReceiver onNewReadingAdded = new BroadcastReceiver() {
+    private BroadcastReceiver onReadingAdded = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             UpdateGraphFragment(intent);
         }
     };
 
-    private BroadcastReceiver onReaddingRemoved = new BroadcastReceiver() {
+    private BroadcastReceiver onReadingRemoved = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             UpdateGraphFragment(intent);
@@ -118,13 +116,13 @@ public class DetailActivity extends AppCompatActivity {
             unbindService(_connection);
         }
 
-        _binder.RemovePropertiesReadingListener(UniqueDiscription);
+        _binder.RemovePropertiesReadingListener(UniqueDescription);
         super.onDestroy();
     }
 
     private void UpdateGraphFragment(Intent intent){
         if(!_isBoundToService) {
-            throw new RuntimeException("Overview Activity was not bound to service, in a time where is should!");
+            throw new RuntimeException(NOT_BOUND_TO_SERVICE_EXCEPTION_MESSAGE);
         }
 
         // updates the historical readings in the graph
@@ -159,7 +157,7 @@ public class DetailActivity extends AppCompatActivity {
     private void UpdateCurrentReadingUI(){
         // update the current value
         PropertiesReading current = _binder.GetCurrent();
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd. MMM yyyy  hh:mm:ss aa");
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT_PATTERN);
         String readableDate = formatter.format(TimeStampHelper.get_dataTime(current.getTimeStamp()));
         String valueHumidity = current.getProperties().get("humidity") + "%";
         String valueBattery = current.getProperties().get(batteryString) + "%";
