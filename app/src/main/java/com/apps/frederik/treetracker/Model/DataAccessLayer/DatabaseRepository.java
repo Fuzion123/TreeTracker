@@ -3,8 +3,6 @@ package com.apps.frederik.treetracker.Model.DataAccessLayer;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
 import com.apps.frederik.treetracker.Globals;
 import com.apps.frederik.treetracker.Model.MonitoredObject.MonitoredObject;
 import com.apps.frederik.treetracker.Model.PropertiesReading.PropertiesReading;
@@ -14,7 +12,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -217,7 +214,7 @@ public class DatabaseRepository {
     private String convertTime(String time){
         String regx = "\\.[0-9]*";
         time = time.replaceAll(regx, "");
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date d = null;
